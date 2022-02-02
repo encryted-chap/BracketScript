@@ -1,0 +1,16 @@
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\bin\Debug\net5.0\BracketScript.exe
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\bin\Debug\net5.0\BracketScript.deps.json
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\bin\Debug\net5.0\BracketScript.runtimeconfig.json
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\bin\Debug\net5.0\BracketScript.runtimeconfig.dev.json
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\bin\Debug\net5.0\BracketScript.dll
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\bin\Debug\net5.0\ref\BracketScript.dll
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\bin\Debug\net5.0\BracketScript.pdb
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\obj\Debug\net5.0\BracketScript.csproj.AssemblyReference.cache
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\obj\Debug\net5.0\BracketScript.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\obj\Debug\net5.0\BracketScript.AssemblyInfoInputs.cache
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\obj\Debug\net5.0\BracketScript.AssemblyInfo.cs
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\obj\Debug\net5.0\BracketScript.csproj.CoreCompileInputs.cache
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\obj\Debug\net5.0\BracketScript.dll
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\obj\Debug\net5.0\ref\BracketScript.dll
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\obj\Debug\net5.0\BracketScript.pdb
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\obj\Debug\net5.0\BracketScript.genruntimeconfig.cache

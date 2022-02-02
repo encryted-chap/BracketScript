@@ -1,0 +1,4 @@
+
+; default entrypoint
+func MAIN():
+    pass

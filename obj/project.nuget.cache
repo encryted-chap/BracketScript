@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "/u0htg0p0O1s991jeg1T+7pBggjOS9xvFvpF+RlMmBZPXzAZuJslaQbpVfbVj0+vgxaq9i4fuBIMvljz05TI6g==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\BracketScript.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\awkward\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.13\\microsoft.netcore.app.host.win-x64.5.0.13.nupkg.sha512"
+  ],
+  "logs": []
+}
