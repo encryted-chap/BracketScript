@@ -4,5 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
-
+  <ItemGroup>
+    <EmbeddedResource Include="bundle/nasm.exe" />
+  </ItemGroup>
 </Project>

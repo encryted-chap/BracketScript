@@ -15,9 +15,10 @@ namespace BracketScript
         public Dictionary<string, Function> contained_f;
         public Dictionary<string, Variable> contained_v;
 
+        // reference id of this scope (to find in internal_scopes)
         public string refid;
 
-        public Dictionary<string, Scope> internal_scopes=new Dictionary<string, Scope>();
+        public static Dictionary<string, Scope> internal_scopes=new Dictionary<string, Scope>();
         public Scope(string refid="") {
             // begone, null refs >:(
             contained_c = new Dictionary<string, Class>();
@@ -31,16 +32,20 @@ namespace BracketScript
             internal_scopes.Add(this.refid, this); // pass this to scopes
         }
         // create a new scope contained in this one
-        Scope CreateUnder() {
-            Scope ns = new Scope();
-            ns = inheritall(ns);
+        public Scope CreateUnder() {
+            Scope ns = new Scope(); // register new scope
+            internal_scopes[ns.refid] = inheritall(ns); // inherit values and save
             return ns;
         }
-        Scope inheritall(Scope s) {
-            s = inheritc(s);
-            s = inheritf(s);
-            s = inheritv(s);
-            return s;
+        // inherits all the properties from another scope (InheritFrom)
+        public static Scope Inherit(Scope toInherit, Scope InheritFrom) {
+            return InheritFrom.inheritall(toInherit);
+        }
+        public Scope inheritall(Scope s) {
+            s = inheritc(s); // inherit classes,
+            s = inheritf(s); // functions,
+            s = inheritv(s); // and variables
+            return s; // assimilated scope :P
         }
         Scope inheritv(Scope s) {
             var en = contained_v.GetEnumerator();
