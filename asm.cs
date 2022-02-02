@@ -125,6 +125,7 @@ namespace BracketScript {
     public static class _asm_ {
         static int malloc_index;
         
+        // enumerated registers for easy access
         public enum Regs {
             eax, ebx, ecx, edx,
             ax, bx, cx, dx,
@@ -133,6 +134,7 @@ namespace BracketScript {
             esp, ebp, esi, edi,
             sp, bp, si, di
         }
+        // gets the name of a Enum Regs value
         public static string RegName(Regs r) {
             return System.Enum.GetName(typeof(Regs), r);
         }
@@ -140,23 +142,8 @@ namespace BracketScript {
         public static void ClearRegs() {
             for(char c = 'a'; c != 'e'; c++) {
                 string cs = c.ToString(); // just in case lol
-                asm($"xor e{cs}x, e{cs}x");
+                asm($"xor e{cs}x, e{cs}x"); // clear current
             }
         }
-        public static void Memcpy(int dest_addr, byte[] src, int count) {
-            if(count==0) return;
-
-            asm($"mov ebx, dword {dest_addr.ToString("X")}"); // mov ebx, dword 0x[destaddr]
-            for(int i = 0; i < count; i++) {
-                asm($"mov byte [ebx+{i}], {src[i]}");
-            }
-        }
-        // fills with 0 from startaddress to endaddress
-        public static void ClearMem(int startaddress, int endaddress) {
-            int size = startaddress - endaddress;
-            byte[] blankarr = new byte[size+1];
-            Memcpy(startaddress, blankarr, size);
-        }
-        
     }
 }
