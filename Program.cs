@@ -71,8 +71,10 @@ namespace BracketScript
             }
             if(string.IsNullOrEmpty(outp))
                 outp = inp + ".asm";
+            ASM.Add("endloop: jmp endloop"); // just keep the program from "stopped working" error
             File.WriteAllLines(outp, ASM.ToArray());
             string[] names = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+            
             foreach(var n in names) {
                 if(n.Contains("nasm")) {
                     byte[] rstream=new byte[Assembly.GetExecutingAssembly().GetManifestResourceStream(n).Length]; 
@@ -80,8 +82,8 @@ namespace BracketScript
                     File.WriteAllBytes("nasm.exe", rstream);
                     // now invoke NASM.exe
                 var proc = new Process();
-                   //proc.StartInfo.CreateNoWindow = true;
-                   //proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                   proc.StartInfo.CreateNoWindow = true;
+                   proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                     
                     proc.StartInfo.FileName = "cmd.exe";
                     proc.StartInfo.Arguments = $"/c nasm.exe {outp} -f win32 -o {outp}.obj";
