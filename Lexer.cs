@@ -72,7 +72,7 @@ namespace BracketScript {
                 case TokenType.var_dec: {
                     // data="varname,vartype
                     Class varclass = Class.classes[dat[1]]; // get class type
-                    
+                    int stackindex = memory_manager.Alloc(varclass.size); // ensure to allocate space for variable
                 } break;
             }
         }

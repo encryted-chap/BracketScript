@@ -7,6 +7,12 @@ namespace BracketScript
 {
     
     public static class global {
+        public static void gen_id(out string str, int size=12) {
+            str = string.Empty;
+            for(int i = 0; i < size; i++) {
+                str += "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890"[new System.Random().Next(61)];
+            }
+        }
         public static void asm(string code) {
             BracketScript.Program.ASM.Add(code);
         }

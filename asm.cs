@@ -8,16 +8,8 @@ namespace BracketScript {
         public static Dictionary<int, mblock> blocks=
             new Dictionary<int, mblock>();
 
-        public bool free {get {return _free;} set {
-            if(value) {
-                Clear();
-            } _free = value;
-        }}
-        bool _free;
-        
-        void Clear() {
+        public bool free;
 
-        }
         public void WriteB(byte b, int offset, bool selected=false) {
             if(!selected)
                 asm (new string[] {
@@ -96,7 +88,7 @@ namespace BracketScript {
                 if(memory_map[i].index == index) return i;
             return -1;
         }
-        // finds the first free memory block and returns the index in memory_map
+        // finds the first free memory block and returns the stack index of this mblock 
         public static int Alloc(int memsize) {
             for(int i = 0; i < memory_map.Count; i++) {
                 // if memory would fit, return
