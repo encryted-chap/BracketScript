@@ -50,7 +50,7 @@ namespace BracketScript
             return s; // assimilated scope :P
         }
         Scope inheritv(Scope s) {
-            var en = contained_v.GetEnumerator();
+            var en = this.contained_v.GetEnumerator();
             for(int i = 0; i < contained_v.Count; i++) {
                 s.contained_v.Add(en.Current.Key, en.Current.Value);
                 en.MoveNext();
@@ -79,12 +79,48 @@ namespace BracketScript
         public string fullname, name; // identifiers of function
 
         public Class return_type; // the return type of this function
-        public Function(string name, Scope s) {
-            fullname = $"{name}_{s.refid}"; 
+        public Variable[] args; // arguments passed to this function
+        public Scope FunctionScope;
+        public Function(string name, Scope s, Variable[] args=null) {
+            FunctionScope = s.inheritall(new Scope()); // create new inherited scope
+            fullname = $"{name}_{s.refid}"; // assign fullname to avoid errors
+            if(!object.Equals(args, null)) {
+                // check if args are already defined in current scope
+                foreach(Variable a in args) {
+                    // if contains variable,
+                    if(FunctionScope.contained_v.ContainsKey(a.name)) {
+                        // should always be caught by ThrowHere()
+                        throw new System.Exception("Scope already contains a definition for variable " + a.name); // throw if Var exists
+                    }
+                }
+                
+            }
+        }
+        // defines the asm for this code
+        public void DefineASM() {
+
+        }
+        // inserts the asm for calling this function
+        public void Call() {
+            // loads arguments
+            for(int i = 0; i < args.Length; i++) {
+                asm("mov eax, ebp"); // get stack val
+                asm($"sub eax, {args[i].stack_index}"); // point to address
+                asm("mov [arg{i}], eax"); // store variable address
+            }
+            // set up stack such that address doesnt overwrite allocated memory
+            int ret = memory_manager.Alloc(4); // allocate 4 bytes for return address
+            asm("mov eax, ebp");
+            asm($"sub eax, {ret}"); // point eax to allocated memory
+            asm($"call {fullname}"); // call function (will push return address to allocated memory)
+            // clear arguments
+            for(int i = 0; i < args.Length; i++) 
+                asm($"mov dword [arg{i}], 0");
+            memory_manager.Free(ret); // free address memory
         }
     }
     public class Class {
-        Scope classScope;
+        public Scope classScope;
         public string id; // the identifier used for this class
         public int size; // size (in bytes) to be allocated for a class instance
 

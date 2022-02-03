@@ -83,9 +83,9 @@ namespace BracketScript {
             }
         }
         // returns the index in memory_map that this mblock is located at
-        public static int Find(int index) {
+        public static int Find(int stack_index) {
             for(int i = 0; i < memory_map.Count; i++)
-                if(memory_map[i].index == index) return i;
+                if(memory_map[i].index == stack_index) return i;
             return -1;
         }
         // finds the first free memory block and returns the stack index of this mblock 
