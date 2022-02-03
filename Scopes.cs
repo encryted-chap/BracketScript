@@ -8,6 +8,8 @@ namespace BracketScript
     
     public class Variable {
         public string name;
+        public Class retType;
+        public int stack_index;
     }
     public class Scope {
         // things accessible within this scope
@@ -73,18 +75,26 @@ namespace BracketScript
         }
     }
     public class Function {
-        public List<string> instructions=new List<string>();
+        public List<string> instructions=new List<string>(); // the assembly code of this Function
+        public string fullname, name; // identifiers of function
+
+        public Class return_type; // the return type of this function
+        public Function(string name, Scope s) {
+            fullname = $"{name}_{s.refid}"; 
+        }
     }
     public class Class {
-        public static Dictionary<string, Class> classes =
-            new Dictionary<string, Class>();
+        Scope classScope;
         public string id; // the identifier used for this class
         public int size; // size (in bytes) to be allocated for a class instance
-        public Dictionary<string, Function> functions; // get functions by name
 
-        public Class(string name) {
+        public Class(string name, Scope s) {
             id = name;
-            functions = new Dictionary<string, Function>();
+            
+            classScope = new Scope(); // initialize new scope
+            classScope = classScope.inheritall(s); // inherit higher scope
+            s.contained_c.Add(id, this); // place in scope
+            
         }
     }
     

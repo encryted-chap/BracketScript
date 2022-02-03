@@ -33,17 +33,26 @@ namespace BracketScript {
         }
     }
     public class Lexer {
+        public static Scope currentScope;
         public static List<Token> Lexify (string input) {
             // get processor output
             List<string> processed = PreProcessor.Process(
                 File.ReadAllLines(input)
             );
-            List<Token> ret = new List<Token>();
+            List<Token> ret = new List<Token>(); // token collection
+            currentScope = new Scope("global"); // initialize global scope
+
+            // define built-in class types
+            Class b = new Class("byte", Scope.internal_scopes["global"]) // initialize byte class
+            {
+                size = 1
+            };
+            
 
             for(int i = 0; i < processed.Count; i++) {
-
+                ret.AddRange(Token.GetTokens(processed[i])); // add token to token collection
             }
-            return new List<Token>();
+            return ret;
         }
         
     }
@@ -55,6 +64,7 @@ namespace BracketScript {
         public enum TokenType {
             function_dec, var_dec,
             var_assign, keyword,
+            class_dec
         } TokenType t_type;
         
         public void ThrowHere(Exception e) {
@@ -70,10 +80,20 @@ namespace BracketScript {
             string[] dat = T.data.Split(','); // split at commas
             switch(T.t_type) {
                 case TokenType.var_dec: {
-                    // data="varname,vartype
-                    Class varclass = Class.classes[dat[1]]; // get class type
-                    int stackindex = memory_manager.Alloc(varclass.size); // ensure to allocate space for variable
+                    // data="varname,vartype"
+                    Class vclass = Lexer.currentScope.contained_c[dat[1]]; // get class by id
+                    int sindex = memory_manager.Alloc(vclass.size); // allocate variable
+
+                    // use data to declare new variable
+                    Variable v = new Variable() {
+                        name = dat[0],
+                        retType = vclass,
+                        stack_index = sindex
+                    };
+                    Lexer.currentScope.contained_v.Add(v.name, v); // add to this Scope
+                    // now variable should be initialized
                 } break;
+                
             }
         }
     }
