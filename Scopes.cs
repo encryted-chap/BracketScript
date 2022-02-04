@@ -44,36 +44,29 @@ namespace BracketScript
             return InheritFrom.inheritall(toInherit);
         }
         public Scope inheritall(Scope s) {
-            if(s.contained_c.Count != 0)
-                s = inheritc(s); // inherit classes,
-            if(s.contained_f.Count != 0)
-                s = inheritf(s); // functions,
-            if(s.contained_v.Count != 0)
+            if(contained_v.Count != 0)
                 s = inheritv(s); // and variables
+            if(contained_c.Count != 0)
+                s = inheritc(s); // inherit classes,
+            if(contained_f.Count != 0)
+                s = inheritf(s); // functions,
+            
             return s; // assimilated scope :P
         }
         Scope inheritv(Scope s) {
-            var en = this.contained_v.GetEnumerator();
-            for(int i = 0; i < contained_v.Count; i++) {
-                s.contained_v.Add(en.Current.Key, en.Current.Value);
-                en.MoveNext();
-            }
+            foreach(var v in this.contained_v)
+                s.contained_v.Add(v.Key, v.Value);
+            
             return s;
         }
         Scope inheritc(Scope s) {
-            var en = contained_c.GetEnumerator();
-            for(int i = 0; i < contained_c.Count; i++) {
-                s.contained_c.Add(en.Current.Key, en.Current.Value);
-                en.MoveNext();
-            }
+            foreach(var c in this.contained_c)
+                s.contained_c.Add(c.Key, c.Value);
             return s;
         }
         Scope inheritf(Scope s) {
-            var en = contained_f.GetEnumerator();
-            for(int i = 0; i < contained_f.Count; i++) {
-                s.contained_f.Add(en.Current.Key, en.Current.Value);
-                en.MoveNext();
-            }
+            foreach(var f in this.contained_f)
+                s.contained_f.Add(f.Key, f.Value);
             return s;
         }
     }
