@@ -58,7 +58,7 @@ namespace BracketScript {
     public class Token {
         public static int CurrentLine;
         public string _refid; 
-        public string data;
+        public string data; // raw text data that makes up this token (not code, config data)
         int Line; // the line that this token takes place
         int indent; // the indentation present on this token
         public enum TokenType {
@@ -68,12 +68,19 @@ namespace BracketScript {
         } TokenType t_type;
         
         public void ThrowHere(Exception e) {
-            Debug.Error($"At line: {Line} \n>> {e.Message}");
+            Debug.Error($"At line {Line}: {e.Message}");
             Environment.Exit(0);
         }
+        // converts a line of code into a Token (or Tokens)
         public static Token[] GetTokens(string line) {
             List<Token> ret = new List<Token>();
-
+            string[] data = line.Split(' '); // get each word
+            for(int i = 0; i < data.Length; i++) {
+                
+            }
+            for(int i = 0; i < ret.Count; i++)
+                ret[i].Line = CurrentLine; // make sure to set the line
+            
             CurrentLine++; // increase the current line for accuracy
             return ret.ToArray();
         }
@@ -99,7 +106,7 @@ namespace BracketScript {
                     Lexer.currentScope.contained_v.Add(v.name, v); // add to this Scope
                     // now variable should be initialized
                 } break;
-
+                
                 
             }
         }
