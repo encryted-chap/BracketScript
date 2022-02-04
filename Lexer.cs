@@ -63,10 +63,40 @@ namespace BracketScript {
         int indent; // the indentation present on this token
         public enum TokenType {
             function_dec, var_dec,
-            var_assign, keyword,
-            class_dec, empty_line
+            eq_operator, keyword,
+            class_dec, empty_line, 
+            str, integer, floating_int, // constants
+            unknown_symbol, class_type, 
+            variable_name, function_name
         } TokenType t_type;
         
+        // puts types together in order to make an executeable token
+        public static Token Concatenate(Token[] tokens) {
+            
+            Token ret = new Token(); // the new token to return
+            // concatenate using type order
+            for(int i = 0; i < tokens.Length; i++) {
+                switch(tokens[i].t_type) {
+                    case TokenType.unknown_symbol: {
+                        // attempt to find declaration of current symbol
+                        if(Lexer.currentScope.contained_c.ContainsKey(tokens[i].data)) {
+                            // if current scope contains class, its a class
+                            tokens[i].t_type = TokenType.class_type;
+                        } else if(Lexer.currentScope.contained_v.ContainsKey(tokens[i].data)) {
+                            // same thing but its a variable
+                            tokens[i].t_type = TokenType.variable_name;
+                        } else if(Lexer.currentScope.contained_f.ContainsKey(tokens[i].data)) {
+                            // same thing but its a function
+                            tokens[i].t_type = TokenType.function_name;
+                        } 
+                        if(tokens[i].t_type != TokenType.unknown_symbol) break; // if its been resolved, break
+                        else continue; // maybe its a definition idk
+                    }
+
+                }
+            }
+            return new Token();
+        }
         public void ThrowHere(Exception e) {
             Debug.Error($"At line {Line}: {e.Message}");
             Environment.Exit(0);
@@ -74,7 +104,32 @@ namespace BracketScript {
         // converts a line of code into a Token (or Tokens)
         public static Token[] GetTokens(string line) {
             List<Token> ret = new List<Token>();
+            int line_indent=0;
+            for(int i = 0; i < line.Length; i++) {
+                if(line[i] == '\t') line_indent++; // get trailing tabs
+                else break;
+            }
+            // single tokens
+            switch(line) {
+                case "pass":
+                    ret.Add(new Token() {
+                        t_type = TokenType.keyword, // pass is a keyword
+                        data = "pass", // make sure Execute() knows which token
+                        Line = Token.CurrentLine, // make sure to log line this traces back to
+                        indent = line_indent
+                    });
+                    return ret.ToArray();
+                case "":
+                    ret.Add(new Token() {
+                        t_type = TokenType.empty_line, // basic empty line
+                        Line = Token.CurrentLine, // log current line
+                        indent = line_indent
+                    });
+                    return ret.ToArray();
+                
+            }
             string[] data = line.Split(' '); // get each word
+            
             for(int i = 0; i < data.Length; i++) {
                 
             }
@@ -105,9 +160,7 @@ namespace BracketScript {
                     };
                     Lexer.currentScope.contained_v.Add(v.name, v); // add to this Scope
                     // now variable should be initialized
-                } break;
-                
-                
+                } break; 
             }
         }
     }
