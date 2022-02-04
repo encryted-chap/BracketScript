@@ -10,6 +10,39 @@ namespace BracketScript
         public string name;
         public Class retType;
         public int stack_index;
+
+        // loads a pointer to this variable to an assembly register
+        public void LoadPtr(_asm_.Regs register = _asm_.Regs.eax) {
+            asm(new string[] {
+                "mov eax, ebp",
+                $"sub eax, {stack_index}", // point to addr
+                $"mov {_asm_.RegName(register)}, eax" // load to reg
+            });
+        }
+
+        // allocates then stores this var into memory
+        // if already allocated, writes to this address
+        public void Alloc() {
+            int index = memory_manager.Find(stack_index); // attempt to find variable memory
+            if(index == -1) {
+                // allocate new memory block
+                index = memory_manager.Alloc(retType.size); 
+            } else {
+                // get existing memory block
+                index = memory_manager.memory_map[index].index;
+            }
+            int offset = 0; // byte offset for storing to memory
+            foreach(var b in Class.GetBytes(this)) {
+                b.LoadPtr(_asm_.Regs.eax); // point eax to byte
+                // write to block
+                asm(new string[] {
+                    "mov al, byte [eax]", // get byte value
+                    $"mov byte [0x{(index+offset).ToString("X")}], al" // store byte value and increment index
+                });
+                offset++; // increment offset accordingly
+            }
+            // now memory block should be filled with byte values :D
+        }
     }
     public class Scope {
         // things accessible within this scope
@@ -129,6 +162,19 @@ namespace BracketScript
             classScope = classScope.inheritall(s); // inherit higher scope
             s.contained_c.Add(id, this); // place in scope
             
+        }
+        
+        // gets the bytes from a single variable
+        public static Variable[] GetBytes(Variable toGet) {
+            List<Variable> ret = new List<Variable>();
+            // recursive funny business
+            foreach(var v in toGet.retType.classScope.contained_v) {
+                // search variables for byte classes recursively
+                if(v.Value.retType.id == "byte") {
+                    ret.Add(v.Value); // add byte class
+                } else ret.AddRange(GetBytes(v.Value)); // otherwise find bytes in THIS variable
+            }
+            return ret.ToArray(); // finally return the bytes
         }
     }
     
