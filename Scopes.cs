@@ -44,9 +44,12 @@ namespace BracketScript
             return InheritFrom.inheritall(toInherit);
         }
         public Scope inheritall(Scope s) {
-            s = inheritc(s); // inherit classes,
-            s = inheritf(s); // functions,
-            s = inheritv(s); // and variables
+            if(s.contained_c.Count != 0)
+                s = inheritc(s); // inherit classes,
+            if(s.contained_f.Count != 0)
+                s = inheritf(s); // functions,
+            if(s.contained_v.Count != 0)
+                s = inheritv(s); // and variables
             return s; // assimilated scope :P
         }
         Scope inheritv(Scope s) {

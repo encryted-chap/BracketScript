@@ -89,9 +89,7 @@ namespace BracketScript {
                             // same thing but its a function
                             tokens[i].t_type = TokenType.function_name;
                         } 
-                        if(tokens[i].t_type != TokenType.unknown_symbol) break; // if its been resolved, break
-                        else continue; // maybe its a definition idk
-                    }
+                    } continue; // since this has been unresolved, continue
 
                 }
             }
