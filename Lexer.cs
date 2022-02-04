@@ -1,9 +1,9 @@
-using BracketScript;
 using System.IO;
 using System;
 using System.Collections.Generic;
 
-namespace BracketScript {
+namespace BracketScript
+{
     public class PreProcessor {
         static List<string> code;
         public static List<string> Process(string[] raw_code) {
