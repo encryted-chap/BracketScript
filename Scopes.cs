@@ -19,6 +19,7 @@ namespace BracketScript
 
         // reference id of this scope (to find in internal_scopes)
         public string refid;
+        public int Indentation; // the indentation of this Scope (amount of tabs)
 
         public static Dictionary<string, Scope> internal_scopes=new Dictionary<string, Scope>();
         public Scope(string refid="") {
@@ -37,6 +38,7 @@ namespace BracketScript
         public Scope CreateUnder() {
             Scope ns = new Scope(); // register new scope
             internal_scopes[ns.refid] = inheritall(ns); // inherit values and save
+            
             return ns;
         }
         // inherits all the properties from another scope (InheritFrom)
@@ -50,7 +52,7 @@ namespace BracketScript
                 s = inheritf(s); // functions,
             if(contained_v.Count != 0)
                 s = inheritv(s); // and variables
-            
+            s.Indentation = this.Indentation+1; // make sure to insert proper indentation 
             return s; // assimilated scope :P
         }
         Scope inheritv(Scope s) {
