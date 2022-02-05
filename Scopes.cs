@@ -43,6 +43,26 @@ namespace BracketScript
             }
             // now memory block should be filled with byte values :D
         }
+        // this == v (call t* equals(v) in asm)
+        public void Equals(Variable v) {
+
+        }
+        // this = v (call t* assign(v) in asm)
+        public void Assign(Variable v) {
+
+        }
+        // this = v (call t* Mul(v) in asm)
+        public void Multiply(Variable v) {
+            
+        }
+        public Variable(Class type, string name, Variable[] args = new Variable[0]) {
+            // call type.new()
+            if(type.classScope.contained_f.ContainsKey("new")) {
+                Function f = type.classScope.contained_f["new"];
+                if(args.Length[0] == 0) f.Call(); // call with no args
+            }
+            
+        }
     }
     public class Scope {
         // things accessible within this scope
@@ -148,6 +168,17 @@ namespace BracketScript
             for(int i = 0; i < args.Length; i++) 
                 asm($"mov dword [arg{i}], 0");
             memory_manager.Free(ret); // free address memory
+        }
+        public void Call(Variable[] args=new Variable[0]) {
+            // if all arguments passed, call success
+            if(this.args.Length == args.Length) {
+                for(int i = 0; i < args.Length; i++) {
+
+                }
+            } 
+            else throw new System.Exception (
+                $"Function call Call({name}) passed invalid arguments"
+            );
         }
     }
     public class Class {
