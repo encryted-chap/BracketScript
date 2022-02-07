@@ -10,6 +10,7 @@ namespace BracketScript
         public string name;
         public Class retType;
         public int stack_index;
+        public bool isNull=true;
 
         // loads a pointer to this variable to an assembly register
         public void LoadPtr(_asm_.Regs register = _asm_.Regs.eax) {
@@ -42,6 +43,16 @@ namespace BracketScript
                 offset++; // increment offset accordingly
             }
             // now memory block should be filled with byte values :D
+            isNull = false; // now it has been allocated
+        }
+        // deallocates this variable (garbage collection)
+        public void Free() {
+            if(!isNull) {
+                // if not null then freeing is valid
+                mblock m =  memory_manager.memory_map[memory_manager.Find(stack_index)]; // get this mblock
+                if(!m.free) memory_manager.Free(m); // if not already free, free
+                isNull = true; // make sure its declared as null
+            }
         }
     }
     public class Scope {
@@ -151,7 +162,7 @@ namespace BracketScript
         }
     }
     public class Class {
-        public Scope classScope;
+        public Scope classScope; // the scope containing everything inside this class
         public string id; // the identifier used for this class
         public int size; // size (in bytes) to be allocated for a class instance
 
