@@ -14,3 +14,5 @@ C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\obj\Debug\net5.0\Brack
 C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\obj\Debug\net5.0\ref\BracketScript.dll
 C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\obj\Debug\net5.0\BracketScript.pdb
 C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\obj\Debug\net5.0\BracketScript.genruntimeconfig.cache
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\bin\Debug\net5.0\MoonSharp.Interpreter.dll
+C:\Users\awkward\Desktop\Project Folders\C#\BracketScript\obj\Debug\net5.0\BracketScript.csproj.CopyComplete

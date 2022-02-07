@@ -1,6 +1,8 @@
 using System.IO;
 using System;
 using System.Collections.Generic;
+using MoonSharp;
+using MoonSharp.Interpreter;
 
 namespace BracketScript
 {
@@ -40,16 +42,9 @@ namespace BracketScript
                 File.ReadAllLines(input)
             );
             List<Token> ret = new List<Token>(); // token collection
-            currentScope = new Scope("global"); // initialize global scope
-
-            // define built-in class types
-            Class b = new Class("byte", Scope.internal_scopes["global"]) // initialize byte class
-            {
-                size = 1,
-            }; 
-            Function b_new = new Function("new", b.classScope);
             for(int i = 0; i < processed.Count; i++) {
-                ret.AddRange(Token.GetTokens(processed[i])); // add token to token collection
+                // pass argument to Lua script
+
             }
             return ret;
         }

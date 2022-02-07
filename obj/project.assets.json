@@ -1,11 +1,52 @@
 {
   "version": 3,
   "targets": {
-    "net5.0": {}
+    "net5.0": {
+      "MoonSharp/2.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.6/MoonSharp.Interpreter.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.6/MoonSharp.Interpreter.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "MoonSharp/2.0.0": {
+      "sha512": "uiAcRh7d+53k3xW9pFDJfAFVw4RnjHVCJG05M3oPAVEVwPtFavhg1H/IpC6So4X1j9kJlzuLlA3OghhPcIvc5A==",
+      "type": "package",
+      "path": "moonsharp/2.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net35-client/MoonSharp.Interpreter.dll",
+        "lib/net35-client/MoonSharp.Interpreter.pdb",
+        "lib/net35-client/MoonSharp.Interpreter.xml",
+        "lib/net40-client/MoonSharp.Interpreter.dll",
+        "lib/net40-client/MoonSharp.Interpreter.pdb",
+        "lib/net40-client/MoonSharp.Interpreter.xml",
+        "lib/netcore/MoonSharp.Interpreter.deps.json",
+        "lib/netcore/MoonSharp.Interpreter.dll",
+        "lib/netcore/MoonSharp.Interpreter.pdb",
+        "lib/netcore/MoonSharp.Interpreter.xml",
+        "lib/netstandard1.6/MoonSharp.Interpreter.deps.json",
+        "lib/netstandard1.6/MoonSharp.Interpreter.dll",
+        "lib/netstandard1.6/MoonSharp.Interpreter.pdb",
+        "lib/netstandard1.6/MoonSharp.Interpreter.xml",
+        "lib/portable-net4+sl5+wp8+win8/MoonSharp.Interpreter.dll",
+        "lib/portable-net4+sl5+wp8+win8/MoonSharp.Interpreter.pdb",
+        "lib/portable-net4+sl5+wp8+win8/MoonSharp.Interpreter.xml",
+        "moonsharp.2.0.0.nupkg.sha512",
+        "moonsharp.nuspec"
+      ]
+    }
+  },
   "projectFileDependencyGroups": {
-    "net5.0": []
+    "net5.0": [
+      "MoonSharp >= 2.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\awkward\\.nuget\\packages\\": {},
@@ -14,11 +55,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\BracketScript.csproj",
+      "projectUniqueName": "c:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\BracketScript.csproj",
       "projectName": "BracketScript",
-      "projectPath": "C:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\BracketScript.csproj",
+      "projectPath": "c:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\BracketScript.csproj",
       "packagesPath": "C:\\Users\\awkward\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\obj\\",
+      "outputPath": "c:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Microsoft\\Xamarin\\NuGet\\"
@@ -52,6 +93,12 @@
     "frameworks": {
       "net5.0": {
         "targetAlias": "net5.0",
+        "dependencies": {
+          "MoonSharp": {
+            "target": "Package",
+            "version": "[2.0.0, )"
+          }
+        },
         "imports": [
           "net461",
           "net462",
