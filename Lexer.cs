@@ -43,15 +43,66 @@ namespace BracketScript
             );
             List<Token> ret = new List<Token>(); // token collection
             for(int i = 0; i < processed.Count; i++) {
-                // pass argument to Lua script
-
+                // create new unmanaged token collection:
+                TokenCollection tc = new TokenCollection();
+                DynValue lua_output = Script.RunFile("dummy_file"); // run lua file and grab output
+                string[] toks = lua_output.CastToString().Split("]["); // get each token
+                foreach(var v in toks) {
+                    // create and register new unmanaged token
+                    tc.Add( 
+                        new unmanaged_token(v, i+1) // grab lua return value
+                    );
+                }
+                ret.AddRange(tc.End()); // parse unmanaged_tokens to Tokens
             }
             return ret;
         }
         
     }
+    // token output from lua
+    public class unmanaged_token {
+        public string type, data; // token = token_type:data
+        public int line; // the line this token takes place on
+        public unmanaged_token(string t, int line) {
+            t = t.TrimStart('[').TrimEnd(']'); // just trim off unnecessary seperators
+            type = data = string.Empty; // begone, null refs
+            type = t.Remove(t.IndexOf(':')); // get anything from before :
+            data = t.Substring(t.IndexOf(':')+1); // get anything after the t
+            this.line = line; 
+        }
+        public override string ToString() {
+            return $"[{type}:{data}]";
+        }
+    }
+    // A class for converting a collection of unmanaged tokens into a token
+    public class TokenCollection {
+        List<unmanaged_token> tokens;
+        // registers a single token to this collection
+        public void Add(unmanaged_token t) {
+            if(object.Equals(null, tokens)) 
+                tokens = new List<unmanaged_token>(); // null refs are stinky
+            tokens.Add(t);
+        }
+        public void AddRange(unmanaged_token[] t) {
+            // add each val
+            foreach(var tok in t) 
+                Add(tok);
+        }
+        // returns the tokens created from this line
+        public Token[] End() {
+            List<Token> ret = new List<Token>(); // the list of tokens to return
+            int current = 0; // the current token being developed
+            for(int i = 0; i < tokens.Count; i++) {
+
+                if(object.Equals(null, ret[current])) {
+                    ret.Add(new Token()); // begone nullrefs
+                }
+            }
+            return ret.ToArray(); // dummy 
+        }
+    }
     public class Token {
-        public static int CurrentLine;
+        public static int CurrentLine; // the line this token takes place on
         public string _refid; 
         public string data; // raw text data that makes up this token (not code, config data)
         int Line; // the line that this token takes place
@@ -67,7 +118,6 @@ namespace BracketScript
         
         // puts types together in order to make an executeable token
         public static Token Concatenate(Token[] tokens) {
-            
             Token ret = new Token(); // the new token to return
             // concatenate using type order
             for(int i = 0; i < tokens.Length; i++) {
