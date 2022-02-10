@@ -86,19 +86,45 @@ namespace BracketScript
         public void AddRange(unmanaged_token[] t) {
             // add each val
             foreach(var tok in t) 
-                Add(tok);
+                Add(tok); // add token
         }
         // returns the tokens created from this line
         public Token[] End() {
             List<Token> ret = new List<Token>(); // the list of tokens to return
             int current = 0; // the current token being developed
+            
             for(int i = 0; i < tokens.Count; i++) {
+                bool isZero= !(i > 0);
+                switch(tokens[i].type) {
+                    case "empty_line": 
+                        break; // I don't need to do anything here
+                    case "unknown_symbol": {
+                        if(!isZero && tokens[i-1].type == "unknown_symbol") {
+                            // most likely a var dec
+                            ret.Add (new Token() {
+                                data = $"{tokens[i].data},{tokens[i-1].data}", // varname,classname
+                                t_type = Token.TokenType.var_dec,
+                            });
+                            Variable v = new Variable(); // initialize
+                            v.retType = Lexer.currentScope.contained_c[tokens[i-1].data]; // get class type
+                            // allocate variable
+                            v.Alloc();
+                            Lexer.currentScope.contained_v.Add(v.name, v); // register variable
+                            current++; // increment for the next one
+                        } 
+                    } break;
+                    case "eq_operator": {
+                        ret.Add(new Token() {
+                            data = $"{ret[current-1].data},", // data will be var,var
+                            t_type = Token.TokenType.var_op
+                        });
+                        current++;
+                    } break;
 
-                if(object.Equals(null, ret[current])) {
-                    ret.Add(new Token()); // begone nullrefs
+
                 }
             }
-            return ret.ToArray(); // dummy 
+            return ret.ToArray(); // dummy
         }
     }
     public class Token {
@@ -113,9 +139,12 @@ namespace BracketScript
             class_dec, empty_line, 
             str, integer, floating_int, // constants
             unknown_symbol, class_type, 
-            variable_name, function_name
-        } TokenType t_type;
-        
+            variable_name, function_name,
+            var_op
+        } public TokenType t_type;
+        public string GetData(int index) {
+            return data.Split(',')[index];
+        }
         // puts types together in order to make an executeable token
         public static Token Concatenate(Token[] tokens) {
             Token ret = new Token(); // the new token to return
@@ -205,6 +234,10 @@ namespace BracketScript
                     // now variable should be initialized
                 } break; 
             }
+        }
+        public Token() {
+            CurrentLine++; 
+            global.gen_id(out _refid); // generate randomized identifier
         }
     }
 }

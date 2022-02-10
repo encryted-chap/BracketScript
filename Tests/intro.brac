@@ -1,4 +1,1 @@
-
-; default entrypoint
-func MAIN():
-    pass
+byte c = 10
