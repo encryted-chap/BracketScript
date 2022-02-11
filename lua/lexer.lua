@@ -1,7 +1,11 @@
 function getTokens(line)
-    local output = [[]] -- Tokens output
+	-- Tokens output
+	
+    local output = [[]] 
     
-	function numChar(str, c) -- Function that is used later on which returns the count of character c in string str
+	-- Function that is used later on which returns the count of character c in string str
+
+	function numChar(str, c) 
 		local count = 0;
 		for i = 1,#str do
 			if (str:sub(i,i) == c) then
@@ -10,35 +14,39 @@ function getTokens(line)
 		end
 		return count;
 	end
-    function InsertTok(type, val) -- Function to insert token based on input code
+	
+	-- Function to insert token based on input code
+    function InsertTok(type, val)
     	output = output .. "[" .. type .. ":" .. val .. "]"
     end
+
+	-- This loop will get the number of tabs before the start of a line of code and then insert it as a token,
+	-- keep in mind that tabs after any non-tab characters will not be counted.
+
+	local count = 0
+	for char in string.gmatch(line, ".") do
+		if char == "\t" then
+			count = count + 1
+		else
+			break
+		end
+	end
+	InsertTok("indent", count)
+
     types = {
     	keyword={
-    		"pass while if for break continue return global def",	
-    		 --[[ 
-				function(v) InsertTok("keyword", v) end
-			
-			 	Right now that is unused code, but it is here just in case
-			 	it should be used later for some reason.
-			 ]]--
+    		"pass while if for break continue return global def"
     	},
     	eq_operator={
-    		"+-*/<>:!.,=(){}[]|%^&@;", -- List of equation operators in order to check if strings contain them
-    		function(v) 
-    			for i = 1,#v do
-    			    if types.eq_operator[3][v:sub(i,i)] then
-    				    InsertTok("eq_operator", types.eq_operator[3][v:sub(i,i)])
-    				end
-    			end
-    		end
+			-- List of equation operators in order to check if strings contain them
+    		"+-*/<>:!.,=(){}[]|%^&@;"
     	}
     }
-    local newLine = ""
 
 	-- This part takes each token and seperates them by a space so they can
 	-- be tokenized easier in the next section
-	
+
+	local newLine = ""
     for word in string.gmatch(line, "%S+") do
 		print("LENGTH:", #word, word)
         for i = 1,#word do
@@ -61,27 +69,23 @@ function getTokens(line)
 		print("[=]", newLine)
 		print()
     end
+
 	local tmpstr = ""
 	for word in string.gmatch(newLine, "%S+") do
 		tmpstr = tmpstr .. word .. " "
 	end
-	newLine = tmpstr
-	print("[!]", newLine)
-	print()
+	newLine = tmpstr; print("[!]", newLine); print()
 
 	local words = {}
 	for word in string.gmatch(newLine, "%S+") do
 		words[#words + 1] = word;
 	end
 		
-	tempLine = ""
-	tempstr = ""
-	quit = false
-	local count = 1
+	tempLine, tempstr = ""; quit = false; local count = 1
 	
 	-- This part of the code is necessary for strings with spaces inside of them to get parsed properly
 	-- as well as the concatenation of strings
-	
+
 	for word in string.gmatch(newLine, "%S+") do
 		if quit == true then
 			break
@@ -112,10 +116,9 @@ function getTokens(line)
 	
 	-- Lua magic pattern characters that need to be escaped in order for the
 	-- Parsing logic to function as intended
+
 	local magic = "().%+-*?[]^$" 
-	
 	local tmpstr = ""
-	
 	withSpaces = tempLine:gsub("&^", " ")
 	local laterstr = withSpaces
 	
@@ -134,9 +137,7 @@ function getTokens(line)
 	-- Part of the lexer that takes the variable names and other characters as well
 	-- as the special characters/operators and turns them into tokens based on their type.
 	
-	local icount = 1
-	skip = false
-	
+	local icount = 1; skip = false
     for word in string.gmatch(newLine, "%S+") do
         local count = 0
 		Cword = ""
@@ -152,7 +153,6 @@ function getTokens(line)
 		end
 		
 		-- Inserts keywords from the input line of bracketscript code
-		
         for keyword in string.gmatch(types.keyword[1], "%S+") do
             if Cword:find(keyword, 1, true) then
 				InsertTok("keyword", Cword)
