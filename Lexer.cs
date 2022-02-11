@@ -18,7 +18,7 @@ namespace BracketScript
                 Debug.Error("Empty file fed to preprocessor! Exiting...");
                 Environment.Exit(0);
             }
-            return new List<string>();
+            return PreProcessor.code;
         }
         public static void Stage1() {
             for(int i = 0; i < code.Count; i++) {
@@ -37,22 +37,26 @@ namespace BracketScript
     public class Lexer {
         public static Scope currentScope;
         public static List<Token> Lexify (string input) {
+            Debug.Message("Lexer invoked");
             // get processor output
-            List<string> processed = PreProcessor.Process(
+            List<string> processed = PreProcessor.Process (
                 File.ReadAllLines(input)
             );
+            Debug.Success($"Preprocessing complete: {processed.Count}");
             List<Token> ret = new List<Token>(); // token collection
+
             for(int i = 0; i < processed.Count; i++) {
                 // create new unmanaged token collection:
                 TokenCollection tc = new TokenCollection();
-                DynValue lua_output = Script.RunFile("dummy_file"); // run lua file and grab output
-                string[] toks = lua_output.CastToString().Split("]["); // get each token
-                foreach(var v in toks) {
-                    // create and register new unmanaged token
-                    tc.Add( 
-                        new unmanaged_token(v, i+1) // grab lua return value
-                    );
-                }
+                
+                Script lexerlua = new Script(); // generate new lua script
+
+                lexerlua.DebuggerEnabled = false;
+                lexerlua.Globals["inputline"] = processed[i]; // feed input to lua
+                DynValue val = lexerlua.DoFile("lua/lexer.lua"); // load and execute file
+                string lines_tokens = val.CastToString(); // get return value
+                Debug.Message("token:");
+                Debug.Message(lines_tokens);
                 ret.AddRange(tc.End()); // parse unmanaged_tokens to Tokens
             }
             return ret;
@@ -90,6 +94,8 @@ namespace BracketScript
         }
         // returns the tokens created from this line
         public Token[] End() {
+            if(object.Equals(tokens, null))
+                tokens = new List<unmanaged_token>();
             List<Token> ret = new List<Token>(); // the list of tokens to return
             int current = 0; // the current token being developed
             

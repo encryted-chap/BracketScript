@@ -68,8 +68,6 @@ namespace BracketScript
                         break;
                 }
             }
-            memory_manager.Alloc(13);
-            memory_manager.memory_map[0].Write(System.Text.Encoding.ASCII.GetBytes("hello, world!"));
             // format assembly
             for(int i = 0; i < ASM.Count; i++) {
                 // just make it pretty in a few ways

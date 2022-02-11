@@ -160,3 +160,4 @@ function getTokens(line)
 	
     return output
 end
+return getTokens(inputline)

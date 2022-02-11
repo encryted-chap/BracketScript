@@ -4,11 +4,11 @@ using System;
 namespace BracketScript {
     using static BracketScript.global;
     public class mblock {
-        public int size, index;
+        public int size, index; // the size of this memory block in bytes, and the stack index
         public static Dictionary<int, mblock> blocks=
             new Dictionary<int, mblock>();
 
-        public bool free;
+        public bool free; 
 
         public void WriteB(byte b, int offset, bool selected=false) {
             if(!selected)
