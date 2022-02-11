@@ -160,4 +160,3 @@ function getTokens(line)
 	
     return output
 end
-print(getTokens("str x=\"str go br\" + \"nice\""))
