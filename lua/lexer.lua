@@ -1,7 +1,7 @@
 function getTokens(line)
     local output = [[]] -- Tokens output
     
-	function numChar(str, c)
+	function numChar(str, c) -- Function that is used later on which returns the count of character c in string str
 		local count = 0;
 		for i = 1,#str do
 			if (str:sub(i,i) == c) then
@@ -16,10 +16,15 @@ function getTokens(line)
     types = {
     	keyword={
     		"pass while if for break continue return global def",	
-    		function(v) InsertTok("keyword", v) end
+    		 --[[ 
+				function(v) InsertTok("keyword", v) end
+			
+			 	Right now that is unused code, but it is here just in case
+			 	it should be used later for some reason.
+			 ]]--
     	},
     	eq_operator={
-    		"+-*/<>:!.,=(){}[]|%^&@;",
+    		"+-*/<>:!.,=(){}[]|%^&@;", -- List of equation operators in order to check if strings contain them
     		function(v) 
     			for i = 1,#v do
     			    if types.eq_operator[3][v:sub(i,i)] then
@@ -33,6 +38,7 @@ function getTokens(line)
 
 	-- This part takes each token and seperates them by a space so they can
 	-- be tokenized easier in the next section
+	
     for word in string.gmatch(line, "%S+") do
 		print("LENGTH:", #word, word)
         for i = 1,#word do
@@ -72,6 +78,10 @@ function getTokens(line)
 	tempstr = ""
 	quit = false
 	local count = 1
+	
+	-- This part of the code is necessary for strings with spaces inside of them to get parsed properly
+	-- as well as the concatenation of strings
+	
 	for word in string.gmatch(newLine, "%S+") do
 		if quit == true then
 			break
@@ -88,9 +98,9 @@ function getTokens(line)
 						tempstr = tempstr .. words[i] .. "&!"
 					else
 						if types.eq_operator[1]:find(words[i + 1], 1, true) then
-							tempstr = tempstr .. words[i] .. "&!"
+							tempstr = tempstr .. words[i] .. "&!" -- This symbol is used for the spaces that separate the two strings
 						else
-							tempstr = tempstr .. words[i] .. "&^"
+							tempstr = tempstr .. words[i] .. "&^" -- This symbol is used for the spaces inside of the strings
 						end
 					end
 				end
@@ -99,10 +109,16 @@ function getTokens(line)
 		end
 		count = count + 1
 	end
-	local magic = "().%+-*?[]^$"
+	
+	-- Lua magic pattern characters that need to be escaped in order for the
+	-- Parsing logic to function as intended
+	local magic = "().%+-*?[]^$" 
+	
 	local tmpstr = ""
+	
 	withSpaces = tempLine:gsub("&^", " ")
 	local laterstr = withSpaces
+	
 	for i=1,#withSpaces do
 		if magic:find(withSpaces:sub(i, i)) and withSpaces:sub(i,i) ~= "" then
 			tmpstr = tmpstr .. "%" .. withSpaces:sub(i,i) 
@@ -110,14 +126,17 @@ function getTokens(line)
 			tmpstr = tmpstr .. withSpaces:sub(i,i)	
 		end
 	end
+	
 	withSpaces = tmpstr:gsub("&!", " ")
 	withoutSpaces = tmpstr:gsub(" ", "&^"):gsub("&!", " ")
 	newLine = newLine:gsub(withSpaces, withoutSpaces)
 		
 	-- Part of the lexer that takes the variable names and other characters as well
 	-- as the special characters/operators and turns them into tokens based on their type.
+	
 	local icount = 1
 	skip = false
+	
     for word in string.gmatch(newLine, "%S+") do
         local count = 0
 		Cword = ""
@@ -131,6 +150,9 @@ function getTokens(line)
 		else 
 			Cword = word;
 		end
+		
+		-- Inserts keywords from the input line of bracketscript code
+		
         for keyword in string.gmatch(types.keyword[1], "%S+") do
             if Cword:find(keyword, 1, true) then
 				InsertTok("keyword", Cword)
