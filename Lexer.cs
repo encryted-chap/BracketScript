@@ -1,7 +1,6 @@
 using System.IO;
 using System;
 using System.Collections.Generic;
-using MoonSharp;
 using MoonSharp.Interpreter;
 
 namespace BracketScript
@@ -90,7 +89,7 @@ namespace BracketScript
                 }
             }
             this.line = line; 
-            
+            type = type.Trim(':');
         }
         public override string ToString() {
             return $"[{type}:{data}]";
@@ -115,16 +114,16 @@ namespace BracketScript
             if(object.Equals(tokens, null))
                 tokens = new List<unmanaged_token>();
             List<Token> ret = new List<Token>(); // the list of tokens to return
-            
+            int indent = 0; // get indentation
             for(int i = 0; i < tokens.Count; i++) {
-                Console.WriteLine("type: ", tokens[i].type);
-                /*
-                ret.Add(new Token () {
-                    t_type = Enum.Parse<Token.TokenType>(tokens[i].type),
-                    data = tokens[i].data,
-                    
-                });
-                */
+                if(tokens[i].type == "indent") {
+                    indent = Convert.ToInt32(tokens[i].data);
+                } else {
+                    ret.Add(new Token () {
+                        t_type = Enum.Parse<Token.TokenType>(tokens[i].type),
+                        data = tokens[i].data,
+                    });
+                }
             }
             return ret.ToArray(); // dummy
         }
@@ -139,7 +138,7 @@ namespace BracketScript
             function_dec, var_dec,
             eq_operator, keyword,
             class_dec, empty_line, 
-            str, integer, floating_int, // constants
+            str, num,  // constants
             unknown_symbol, class_type, 
             variable_name, function_name,
             var_op

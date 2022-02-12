@@ -112,9 +112,6 @@ namespace BracketScript
             File.Delete(outp + ".obj");
             
                 
-            // remove bundled executeables
-            File.Delete("lua/lexer.lua");
-            Directory.Delete("lua");
             File.Delete("nasm.exe");
             System.Environment.Exit(0);
         }

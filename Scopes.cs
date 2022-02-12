@@ -44,6 +44,7 @@ namespace BracketScript
             }
             // now memory block should be filled with byte values :D
             isNull = false; // now it has been allocated
+            memory_manager.memory_map[memory_manager.Find(stack_index)].Write(new byte[retType.size]); // write null to clear memory
         }
         // deallocates this variable (garbage collection)
         public void Free() {
