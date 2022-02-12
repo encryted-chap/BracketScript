@@ -48,11 +48,7 @@ namespace BracketScript
             TokenCollection tc = new TokenCollection();
 
             for(int i = 0; i < processed.Count; i++) {
-                
-                
                 Script lexerlua = new Script(); // generate new lua script
-
-                lexerlua.DebuggerEnabled = false;
                 lexerlua.Globals["inputline"] = processed[i]; // feed input to lua
                 DynValue val = lexerlua.DoFile("lua/lexer.lua"); // load and execute file
                 string lines_tokens = val.CastToString(); // get return value
@@ -114,18 +110,21 @@ namespace BracketScript
             if(object.Equals(tokens, null))
                 tokens = new List<unmanaged_token>();
             List<Token> ret = new List<Token>(); // the list of tokens to return
-            int indent = 0; // get indentation
+            int line_indent = 0; // get indentation
             for(int i = 0; i < tokens.Count; i++) {
                 if(tokens[i].type == "indent") {
-                    indent = Convert.ToInt32(tokens[i].data);
+                    line_indent = Convert.ToInt32(tokens[i].data);
                 } else {
+                    // register new token
                     ret.Add(new Token () {
-                        t_type = Enum.Parse<Token.TokenType>(tokens[i].type),
-                        data = tokens[i].data,
+                        t_type = Enum.Parse<Token.TokenType>(tokens[i].type), // get the token type
+                        data = tokens[i].data, // get the raw text data of this token
+                        indent = line_indent // get the tabs
                     });
                 }
             }
-            return ret.ToArray(); // dummy
+            Debug.Success($"Unmanaged tokens parsed: count={ret.Count}"); // for debugging
+            return Token.Concat(ret.ToArray()); // return the tokens
         }
     }
     public class Token {
@@ -133,9 +132,9 @@ namespace BracketScript
         public string _refid; 
         public string data; // raw text data that makes up this token (not code, config data)
         int Line; // the line that this token takes place
-        int indent; // the indentation present on this token
+        public int indent; // the indentation present on this token
         public enum TokenType {
-            function_dec, var_dec,
+            function_dec, var_dec, equation, // abstract
             eq_operator, keyword,
             class_dec, empty_line, 
             str, num,  // constants
@@ -143,75 +142,22 @@ namespace BracketScript
             variable_name, function_name,
             var_op
         } public TokenType t_type;
+        // parse tokens into more abstract types (var_dec, )
+        public static Token[] Concat(Token[] input) {
+            List<Token> ret = new List<Token>();
+            ret.AddRange(input); // pass input to return array
+
+            return ret.ToArray();
+        }
         public string GetData(int index) {
             return data.Split(',')[index];
         }
-        // puts types together in order to make an executeable token
-        public static Token Concatenate(Token[] tokens) {
-            Token ret = new Token(); // the new token to return
-            // concatenate using type order
-            for(int i = 0; i < tokens.Length; i++) {
-                switch(tokens[i].t_type) {
-                    case TokenType.unknown_symbol: {
-                        // attempt to find declaration of current symbol
-                        if(Lexer.currentScope.contained_c.ContainsKey(tokens[i].data)) {
-                            // if current scope contains class, its a class
-                            tokens[i].t_type = TokenType.class_type;
-                        } else if(Lexer.currentScope.contained_v.ContainsKey(tokens[i].data)) {
-                            // same thing but its a variable
-                            tokens[i].t_type = TokenType.variable_name;
-                        } else if(Lexer.currentScope.contained_f.ContainsKey(tokens[i].data)) {
-                            // same thing but its a function
-                            tokens[i].t_type = TokenType.function_name;
-                        } 
-                    } continue; // since this has been unresolved, continue
-
-                }
-            }
-            return new Token();
-        }
+        
         public void ThrowHere(Exception e) {
             Debug.Error($"At line {Line}: {e.Message}");
             Environment.Exit(0);
         }
-        // converts a line of code into a Token (or Tokens)
-        public static Token[] GetTokens(string line) {
-            List<Token> ret = new List<Token>();
-            int line_indent=0;
-            for(int i = 0; i < line.Length; i++) {
-                if(line[i] == '\t') line_indent++; // get trailing tabs
-                else break;
-            }
-            // single tokens
-            switch(line) {
-                case "pass":
-                    ret.Add(new Token() {
-                        t_type = TokenType.keyword, // pass is a keyword
-                        data = "pass", // make sure Execute() knows which token
-                        Line = Token.CurrentLine, // make sure to log line this traces back to
-                        indent = line_indent
-                    });
-                    return ret.ToArray();
-                case "":
-                    ret.Add(new Token() {
-                        t_type = TokenType.empty_line, // basic empty line
-                        Line = Token.CurrentLine, // log current line
-                        indent = line_indent
-                    });
-                    return ret.ToArray();
-                
-            }
-            string[] data = line.Split(' '); // get each word
-            
-            for(int i = 0; i < data.Length; i++) {
-                
-            }
-            for(int i = 0; i < ret.Count; i++)
-                ret[i].Line = CurrentLine; // make sure to set the line
-            
-            CurrentLine++; // increase the current line for accuracy
-            return ret.ToArray();
-        }
+        
         // takes a single token and executes it
         public static void Execute(Token[] T) {
             for(int i = 0; i < T.Length; i++) {
