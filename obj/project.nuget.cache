@@ -1,10 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "iCwHpRStzPDT/zsHFcncUJRU1GMRHXE1ISq5K9ChiA3xlK9kc1b+DSB6KjNsqb2BO7VitUG5vpnu9LIMQI7BdQ==",
+  "dgSpecHash": "Q24FmHJopMUMpno4FZjrlOR8/hg/JHSQA733nEnAYgi+PR5QkNQOwh1ecGF6h5uR+Vdr6L1o4llUYH8dB9Buyg==",
   "success": true,
   "projectFilePath": "C:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\BracketScript.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\awkward\\.nuget\\packages\\moonsharp\\2.0.0\\moonsharp.2.0.0.nupkg.sha512",
+    "C:\\Users\\awkward\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\5.0.13\\microsoft.netcore.app.runtime.win-x64.5.0.13.nupkg.sha512",
+    "C:\\Users\\awkward\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\5.0.13\\microsoft.windowsdesktop.app.runtime.win-x64.5.0.13.nupkg.sha512",
+    "C:\\Users\\awkward\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\5.0.13\\microsoft.aspnetcore.app.runtime.win-x64.5.0.13.nupkg.sha512",
     "C:\\Users\\awkward\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.13\\microsoft.netcore.app.host.win-x64.5.0.13.nupkg.sha512"
   ],
   "logs": []

@@ -11,6 +11,17 @@
           "lib/netstandard1.6/MoonSharp.Interpreter.dll": {}
         }
       }
+    },
+    "net5.0/win-x64": {
+      "MoonSharp/2.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.6/MoonSharp.Interpreter.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.6/MoonSharp.Interpreter.dll": {}
+        }
+      }
     }
   },
   "libraries": {
@@ -55,11 +66,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\BracketScript.csproj",
+      "projectUniqueName": "C:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\BracketScript.csproj",
       "projectName": "BracketScript",
-      "projectPath": "c:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\BracketScript.csproj",
+      "projectPath": "C:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\BracketScript.csproj",
       "packagesPath": "C:\\Users\\awkward\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\obj\\",
+      "outputPath": "C:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Microsoft\\Xamarin\\NuGet\\"
@@ -111,7 +122,19 @@
         "warn": true,
         "downloadDependencies": [
           {
+            "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
+            "version": "[5.0.13, 5.0.13]"
+          },
+          {
             "name": "Microsoft.NETCore.App.Host.win-x64",
+            "version": "[5.0.13, 5.0.13]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Runtime.win-x64",
+            "version": "[5.0.13, 5.0.13]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
             "version": "[5.0.13, 5.0.13]"
           }
         ],
@@ -121,6 +144,11 @@
           }
         },
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.101\\RuntimeIdentifierGraph.json"
+      }
+    },
+    "runtimes": {
+      "win-x64": {
+        "#import": []
       }
     }
   }

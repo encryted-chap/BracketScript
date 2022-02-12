@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="bundle/nasm.exe"/>
+    <EmbeddedResource Include="lua/lexer.lua" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MoonSharp" Version="2.0.0"/>
