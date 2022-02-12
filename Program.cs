@@ -56,7 +56,8 @@ namespace BracketScript
                     default:
                         // if it's none of the following args, it means that its an input file
                         inp = args[i];
-                        Lexer.Lexify(args[i]);
+                        var tokens = Lexer.Lexify(args[i]);
+                        Token.Execute(tokens.ToArray()); 
                         break;
                     case "--output": case "-o":
                         // select output

@@ -44,10 +44,12 @@ namespace BracketScript
             );
             Debug.Success($"Preprocessing complete: {processed.Count}");
             List<Token> ret = new List<Token>(); // token collection
+            int cline=0;
+            // create new unmanaged token collection:
+            TokenCollection tc = new TokenCollection();
 
             for(int i = 0; i < processed.Count; i++) {
-                // create new unmanaged token collection:
-                TokenCollection tc = new TokenCollection();
+                
                 
                 Script lexerlua = new Script(); // generate new lua script
 
@@ -57,8 +59,15 @@ namespace BracketScript
                 string lines_tokens = val.CastToString(); // get return value
                 Debug.Message("token:");
                 Debug.Message(lines_tokens);
-                ret.AddRange(tc.End()); // parse unmanaged_tokens to Tokens
+                foreach(var t in lines_tokens.Split("]["))
+                    tc.Add(new unmanaged_token(t, cline)); // register new token collection
+
+                
             }
+            ret.AddRange(tc.End()); // parse unmanaged_tokens to Tokens
+            // prepare execution environment
+            Lexer.currentScope = new Scope("global"); // initialize global scope
+
             return ret;
         }
         
@@ -69,10 +78,19 @@ namespace BracketScript
         public int line; // the line this token takes place on
         public unmanaged_token(string t, int line) {
             t = t.TrimStart('[').TrimEnd(']'); // just trim off unnecessary seperators
-            type = data = string.Empty; // begone, null refs
-            type = t.Remove(t.IndexOf(':')); // get anything from before :
-            data = t.Substring(t.IndexOf(':')+1); // get anything after the t
+            
+            
+            bool isdat=false;
+            foreach(var c in t) {
+                if(!isdat) {
+                    if(c == ':') isdat=true;
+                    type += c;
+                } else {
+                    data += c;
+                }
+            }
             this.line = line; 
+            
         }
         public override string ToString() {
             return $"[{type}:{data}]";
@@ -97,38 +115,16 @@ namespace BracketScript
             if(object.Equals(tokens, null))
                 tokens = new List<unmanaged_token>();
             List<Token> ret = new List<Token>(); // the list of tokens to return
-            int current = 0; // the current token being developed
             
             for(int i = 0; i < tokens.Count; i++) {
-                bool isZero= !(i > 0);
-                switch(tokens[i].type) {
-                    case "empty_line": 
-                        break; // I don't need to do anything here
-                    case "unknown_symbol": {
-                        if(!isZero && tokens[i-1].type == "unknown_symbol") {
-                            // most likely a var dec
-                            ret.Add (new Token() {
-                                data = $"{tokens[i].data},{tokens[i-1].data}", // varname,classname
-                                t_type = Token.TokenType.var_dec,
-                            });
-                            Variable v = new Variable(); // initialize
-                            v.retType = Lexer.currentScope.contained_c[tokens[i-1].data]; // get class type
-                            // allocate variable
-                            v.Alloc();
-                            Lexer.currentScope.contained_v.Add(v.name, v); // register variable
-                            current++; // increment for the next one
-                        } 
-                    } break;
-                    case "eq_operator": {
-                        ret.Add(new Token() {
-                            data = $"{ret[current-1].data},", // data will be var,var
-                            t_type = Token.TokenType.var_op
-                        });
-                        current++;
-                    } break;
-
-
-                }
+                Console.WriteLine("type: ", tokens[i].type);
+                /*
+                ret.Add(new Token () {
+                    t_type = Enum.Parse<Token.TokenType>(tokens[i].type),
+                    data = tokens[i].data,
+                    
+                });
+                */
             }
             return ret.ToArray(); // dummy
         }
@@ -218,27 +214,20 @@ namespace BracketScript
             return ret.ToArray();
         }
         // takes a single token and executes it
-        public static void Execute(Token T) {
-            string[] dat = T.data.Split(','); // split at commas
-            switch(T.t_type) {
-                case TokenType.empty_line: break; // this only exists so we have an accurate line count
-                case TokenType.var_dec: {
-                    // data="varname,vartype"
-                    Class vclass = Lexer.currentScope.contained_c[dat[1]]; // get class by id
-                    
-                    // check for previous definitions of variable and commit error if it does
-                    if(Lexer.currentScope.contained_v.ContainsKey(dat[0]))
-                        T.ThrowHere(new Exception("Scope already contains a definition for variable " + dat[0])); // error
-                    int sindex = memory_manager.Alloc(vclass.size); // allocate variable
-                    // use data to declare new variable
-                    Variable v = new Variable() {
-                        name = dat[0],
-                        retType = vclass,
-                        stack_index = sindex
-                    };
-                    Lexer.currentScope.contained_v.Add(v.name, v); // add to this Scope
-                    // now variable should be initialized
-                } break; 
+        public static void Execute(Token[] T) {
+            for(int i = 0; i < T.Length; i++) {
+                switch(T[i].t_type) {
+                    case TokenType.var_dec:
+                        // create new variable
+                        Variable nv = new Variable() {
+                            name = T[i].GetData(1), // data[1] is the name
+                            retType = Lexer.currentScope.contained_c[T[i].GetData(0)], // classname
+                            isNull = true, // obviously hasn't been allocated yet
+                        };
+                        nv.Alloc(); // allocate this variable in memory_manager
+                        Lexer.currentScope.contained_v.Add(nv.name, nv); // register as var
+                        break;
+                }
             }
         }
         public Token() {
