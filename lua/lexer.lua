@@ -16,6 +16,7 @@ function getTokens(line)
 	end
 	
 	-- Function to insert token based on input code
+	
     function InsertTok(type, val)
     	output = output .. "[" .. type .. ":" .. val .. "]"
     end
