@@ -63,6 +63,8 @@ namespace BracketScript
             // prepare execution environment
             Lexer.currentScope = new Scope("global"); // initialize global scope
 
+            // now to do a second pass on the tokens
+
             return ret;
         }
         
