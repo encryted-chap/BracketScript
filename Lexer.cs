@@ -134,19 +134,15 @@ namespace BracketScript
         int Line; // the line that this token takes place
         public int indent; // the indentation present on this token
         public enum TokenType {
-            function_dec, var_dec, equation, // abstract
-            eq_operator, keyword,
-            class_dec, empty_line, 
+            eq_operator, keyword, empty_line, 
             str, num,  // constants
-            unknown_symbol, class_type, 
-            variable_name, function_name,
-            var_op
+            unknown_symbol
         } public TokenType t_type;
         // parse tokens into more abstract types (var_dec, )
         public static Token[] Concat(Token[] input) {
             List<Token> ret = new List<Token>();
             ret.AddRange(input); // pass input to return array
-            AST_Parser.GetAST(ret);
+            
 
             return ret.ToArray();
         }
@@ -157,24 +153,6 @@ namespace BracketScript
         public void ThrowHere(Exception e) {
             Debug.Error($"At line {Line}: {e.Message}");
             Environment.Exit(0);
-        }
-        
-        // takes a single token and executes it
-        public static void Execute(Token[] T) {
-            for(int i = 0; i < T.Length; i++) {
-                switch(T[i].t_type) {
-                    case TokenType.var_dec:
-                        // create new variable
-                        Variable nv = new Variable() {
-                            name = T[i].GetData(1), // data[1] is the name
-                            retType = Lexer.currentScope.contained_c[T[i].GetData(0)], // classname
-                            isNull = true, // obviously hasn't been allocated yet
-                        };
-                        nv.Alloc(); // allocate this variable in memory_manager
-                        Lexer.currentScope.contained_v.Add(nv.name, nv); // register as var
-                        break;
-                }
-            }
         }
         public Token() {
             CurrentLine++; 
