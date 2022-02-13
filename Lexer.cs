@@ -146,6 +146,7 @@ namespace BracketScript
         public static Token[] Concat(Token[] input) {
             List<Token> ret = new List<Token>();
             ret.AddRange(input); // pass input to return array
+            AST_Parser.GetAST(ret);
 
             return ret.ToArray();
         }
