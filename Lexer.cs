@@ -64,7 +64,41 @@ namespace BracketScript
             Lexer.currentScope = new Scope("global"); // initialize global scope
 
             // now to do a second pass on the tokens
+            List<Token> secondpass = new List<Token>();
+            for(int i = 0; i < ret.Count; i++) {
+                switch(ret[i].t_type) {
+                    case Token.TokenType.unknown_symbol:
+                        // first we need to check if its a definition:
+                        if(ret[i+1].t_type == Token.TokenType.unknown_symbol) {
+                            // this means it is a definition
+                            string classname = ret[i++].data; // get classname from token
+                            string dataname = ret[i].data;
+                            // resolve the class
+                            if(!Lexer.currentScope.contained_c.ContainsKey(classname)) // if the class name doesn't exist, throw exception at token
+                                ret[i-1].ThrowHere(new Exception($"There was no class {classname} defined in scope {Lexer.currentScope.refid}"));
+                            Class defclass = Lexer.currentScope.contained_c[classname]; // get class
+                            if(ret[i+1].t_type == Token.TokenType.eq_operator && ret[i+1].data == "(") {
+                                // this means that this token has been resolved as a function definition
+                                // cool, now let's try to resolve the arguments and create a new function
+                                i+=2; // increment to argument list
+                                while(ret[i].data != ")") {
+                                    // resolve arguments
+                                }
+                            } else {
+                                // this means that it's a Variable declaration, let's make a new variable
+                                Variable v = new Variable() {
+                                    // fill in the data
+                                    retType = defclass,
+                                    name = dataname,
 
+                                };
+                                if(!currentScope.contained_v.TryAdd(v.name, v))
+                                    ret[i-1].ThrowHere(new Exception($"There was already a variable {v.name} defined in scope {Lexer.currentScope.refid}"));
+                            }
+                        }
+                        break;
+                }
+            }
             return ret;
         }
         
