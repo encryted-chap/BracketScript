@@ -187,7 +187,7 @@ namespace BracketScript
         }
         
         public void ThrowHere(Exception e) {
-            Debug.Error($"At line {Line}: {e.Message}");
+            Debug.Error($"At line {Line+1}: {e.Message}");
             Environment.Exit(0);
         }
         public Token() {
