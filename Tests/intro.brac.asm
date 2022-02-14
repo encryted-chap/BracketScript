@@ -20,10 +20,10 @@ _start:
 	mov 	byte [eax-0], 0x0
 testFunc_global:
 	mov 	eax, ebp
-	sub 	eax, 0
+	sub 	eax, 1
 	mov 	byte [eax-0], 0x0
 	mov 	eax, ebp
-	sub 	eax, 0
+	sub 	eax, 2
 	mov 	byte [eax-0], 0x0
 	nop
 endloop:

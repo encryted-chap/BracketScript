@@ -24,21 +24,15 @@ namespace BracketScript
         // allocates then stores this var into memory
         // if already allocated, writes to this address
         public void Alloc() {
-            int index = memory_manager.Find(stack_index); // attempt to find variable memory
-            if(index == -1) {
-                // allocate new memory block
-                index = memory_manager.Alloc(retType.size); 
-            } else {
-                // get existing memory block
-                index = memory_manager.memory_map[index].index;
-            }
+            stack_index = memory_manager.Alloc(retType.size); // attempt to find variable memory
+            
             int offset = 0; // byte offset for storing to memory
             foreach(var b in Class.GetBytes(this)) {
                 b.LoadPtr(_asm_.Regs.eax); // point eax to byte
                 // write to block
                 asm(new string[] {
                     "mov al, byte [eax]", // get byte value
-                    $"mov byte [0x{(index+offset).ToString("X")}], al" // store byte value and increment index
+                    $"mov byte [0x{(stack_index+offset).ToString("X")}], al" // store byte value and increment index
                 });
                 offset++; // increment offset accordingly
             }

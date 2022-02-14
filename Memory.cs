@@ -93,6 +93,7 @@ namespace BracketScript {
             for(int i = 0; i < memory_map.Count; i++) {
                 // if memory would fit, return
                 if(memory_map[i].free && memory_map[i].size <= memsize) {
+
                     // if there is leftover memory, fragment
                     if(memory_map[i].size - memsize != 0) {
                         memory_map.Add(
@@ -103,7 +104,7 @@ namespace BracketScript {
                                 index = memory_map[i].index + (memsize+1) 
                             }
                         );
-                    }
+                    } 
                     memory_map[i].size = memsize; // update block size
                     memory_map[i].free = false; // this is going to be used
                     return memory_map[i].index;
@@ -116,7 +117,7 @@ namespace BracketScript {
                 index = current_index
             };
             // prep index for the next one
-            current_index += memsize + 1;
+            current_index += memsize;
             memory_map.Add(m);
             return m.index;
             
