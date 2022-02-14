@@ -18,5 +18,13 @@ _start:
 	mov 	eax, ebp
 	sub 	eax, 0
 	mov 	byte [eax-0], 0x0
+testFunc_global:
+	mov 	eax, ebp
+	sub 	eax, 0
+	mov 	byte [eax-0], 0x0
+	mov 	eax, ebp
+	sub 	eax, 0
+	mov 	byte [eax-0], 0x0
+	nop
 endloop:
 jmp endloop

@@ -79,7 +79,7 @@ namespace BracketScript
                 switch(ret[i].t_type) {
                     case Token.TokenType.keyword:
                         if(ret[i].data == "pass")
-                            asm("nop\t; pass"); // this means do nothing
+                            asm("\tnop"); // this means do nothing
                         break;
                     case Token.TokenType.unknown_symbol:
                         // first we need to check if its a definition:
@@ -110,10 +110,11 @@ namespace BracketScript
                                     ret[i-1].ThrowHere(new Exception("Illegal function declaration ( maybe missing a : )")); // if it doesnt end with ':', it's not a legal function
                                 int function_indent = ret[++i].indent; 
                                 // add instructions to function
-                                for(++i; i < ret.Count && ret[i].indent >= function_indent; i++) {
-                                    f.toInstructions.Add(ret[i]);
+                                for(; i < ret.Count && ret[i].indent >= function_indent; i++) {
+                                    f.toInstructions.Add(ret[i]); 
                                 } 
                                 currentScope.contained_f.Add(f.fullname, f); // register function
+                                f.DefineASM();
                             } else {
                                 // this means that it's a Variable declaration, let's make a new variable
                                 Variable v = new Variable() {
@@ -125,6 +126,8 @@ namespace BracketScript
                                     ret[i-1].ThrowHere(new Exception($"There was already a variable {v.name} defined in scope {Lexer.currentScope.refid}"));
                                 v.Alloc(); // actually allocate variable
                             }
+                        } else if(ret[i+1].t_type == Token.TokenType.eq_operator && ret[i+1].data == "(") {
+                            // itttts a class call!
                         }
                         break;
                 }
