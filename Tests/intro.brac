@@ -1,1 +1,4 @@
 byte c
+
+byte testFunc(byte a, byte b, byte c):
+    pass

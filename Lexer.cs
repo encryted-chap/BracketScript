@@ -5,6 +5,7 @@ using MoonSharp.Interpreter;
 
 namespace BracketScript
 {
+    using static global;
     public class PreProcessor {
         static List<string> code;
         public static List<string> Process(string[] raw_code) {
@@ -68,9 +69,18 @@ namespace BracketScript
             };
             currentScope.contained_c.Add("byte", Byte);
             // now to do a second pass on the tokens
-            List<Token> secondpass = new List<Token>();
+            ret = Parse(currentScope, ret);
+            
+            return ret;
+        }
+        public static List<Token> Parse(Scope currentScope, List<Token> toParse) {
+            List<Token> ret = toParse; 
             for(int i = 0; i < ret.Count; i++) {
                 switch(ret[i].t_type) {
+                    case Token.TokenType.keyword:
+                        if(ret[i].data == "pass")
+                            asm("nop\t; pass"); // this means do nothing
+                        break;
                     case Token.TokenType.unknown_symbol:
                         // first we need to check if its a definition:
                         if(ret[i+1].t_type == Token.TokenType.unknown_symbol) {
@@ -78,23 +88,38 @@ namespace BracketScript
                             string classname = ret[i++].data; // get classname from token
                             string dataname = ret[i].data;
                             // resolve the class
-                            if(!Lexer.currentScope.contained_c.ContainsKey(classname)) // if the class name doesn't exist, throw exception at token
+                            if(!currentScope.contained_c.ContainsKey(classname)) // if the class name doesn't exist, throw exception at token
                                 ret[i-1].ThrowHere(new Exception($"There was no class {classname} defined in scope {Lexer.currentScope.refid}"));
-                            Class defclass = Lexer.currentScope.contained_c[classname]; // get class
+                            Class defclass = currentScope.contained_c[classname]; // get class
                             if(i+1 < ret.Count && ret[i+1].t_type == Token.TokenType.eq_operator && ret[i+1].data == "(") {
                                 // this means that this token has been resolved as a function definition
                                 // cool, now let's try to resolve the arguments and create a new function
-                                i+=2; // increment to argument list
-                                while(ret[i].data != ")") {
-                                    // resolve arguments
+                                Function f = new Function(ret[i].data, currentScope, null); // initialize
+                                i+=1; // increment to argument list
+                                List<Token> fdec = new List<Token>();
+                                while(ret[i++].data != ")") {
+                                    if(ret[i].data == "," || ret[i].data == "(") continue; 
+                                    else {
+                                        if(ret[i].t_type == Token.TokenType.unknown_symbol) {
+                                            ret[i].indent++; // make sure to add this indent
+                                            f.toInstructions.Add(ret[i]); // append declarations to the beginning of function
+                                        }
+                                    }
                                 }
+                                if(ret[i].data != ":") 
+                                    ret[i-1].ThrowHere(new Exception("Illegal function declaration ( maybe missing a : )")); // if it doesnt end with ':', it's not a legal function
+                                int function_indent = ret[++i].indent; 
+                                // add instructions to function
+                                for(++i; i < ret.Count && ret[i].indent >= function_indent; i++) {
+                                    f.toInstructions.Add(ret[i]);
+                                } 
+                                currentScope.contained_f.Add(f.fullname, f); // register function
                             } else {
                                 // this means that it's a Variable declaration, let's make a new variable
                                 Variable v = new Variable() {
                                     // fill in the data
                                     retType = defclass,
                                     name = dataname,
-
                                 };
                                 if(!currentScope.contained_v.TryAdd(v.name, v))
                                     ret[i-1].ThrowHere(new Exception($"There was already a variable {v.name} defined in scope {Lexer.currentScope.refid}"));
@@ -105,7 +130,7 @@ namespace BracketScript
                 }
             }
             return ret;
-        }
+        } 
         
     }
     // token output from lua
