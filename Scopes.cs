@@ -132,6 +132,7 @@ namespace BracketScript
     }
     public class Function {
         public List<string> instructions=new List<string>(); // the assembly code of this Function
+        public List<Token> toInstructions=new List<Token>(); // list of tokens to be converted to assembly
         public string fullname, name; // identifiers of function
 
         public Class return_type; // the return type of this function
@@ -162,7 +163,7 @@ namespace BracketScript
             for(int i = 0; i < args.Length; i++) {
                 asm("mov eax, ebp"); // get stack val
                 asm($"sub eax, {args[i].stack_index}"); // point to address
-                asm("mov [arg{i}], eax"); // store variable address
+                asm($"mov [arg{i}], eax"); // store variable address
             }
             // set up stack such that address doesnt overwrite allocated memory
             int ret = memory_manager.Alloc(4); // allocate 4 bytes for return address
@@ -173,17 +174,6 @@ namespace BracketScript
             for(int i = 0; i < args.Length; i++) 
                 asm($"mov dword [arg{i}], 0");
             memory_manager.Free(ret); // free address memory
-        }
-        public void Call(Variable[] args) {
-            // if all arguments passed, call success
-            if(this.args.Length == args.Length) {
-                for(int i = 0; i < args.Length; i++) {
-
-                }
-            } 
-            else throw new System.Exception (
-                $"Function call Call({name}) passed invalid arguments"
-            );
         }
     }
     public class Class {
