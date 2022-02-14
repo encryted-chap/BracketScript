@@ -124,15 +124,15 @@ function getTokens(line)
     
     for i=1,#withSpaces do
         if magic:find(withSpaces:sub(i, i)) and withSpaces:sub(i,i) ~= "" then
-            tmpstr = tmpstr .. "%" .. withSpaces:sub(i,i) 
+            tmpstr = tmpstr .. "%" .. withSpaces:sub(i,i) -- Escapes any Lua magic characters using %
         else
-            tmpstr = tmpstr .. withSpaces:sub(i,i)  
+            tmpstr = tmpstr .. withSpaces:sub(i,i)  -- If its not a magic character concat it normally
         end
     end
     
     withSpaces = tmpstr:gsub("&!", " ")
     withoutSpaces = tmpstr:gsub(" ", "&^"):gsub("&!", " ")
-    newLine = newLine:gsub(withSpaces, withoutSpaces)
+    newLine = newLine:gsub(withSpaces, withoutSpaces) -- Replaces the part of the line that has spaces with the one that only has spaces between the two strings.
         
     -- Part of the lexer that takes the variable names and other characters as well
     -- as the special characters/operators and turns them into tokens based on their type.
@@ -159,12 +159,13 @@ function getTokens(line)
                 count = count + 1
             end
         end
+        
         if count == 0 then
             if (types.eq_operator[1]:find(Cword, 1, true)) then
                 InsertTok("eq_operator", Cword)
             else -- If the token is not a special character/operator
                 if numChar(Cword, "\"") >= 2 then
-                    InsertTok("string", Cword:gsub("&^", " "))
+                    InsertTok("string", Cword:gsub("&^", " ")) -- Inserts a string token, replacing its space indicators with real spaces so it is normal
                 elseif type(tonumber(Cword)) == "number" then
                     if words[icount + 1] == "." and type(tonumber(words[icount + 2])) == "number" then
                         InsertTok("float_num", Cword .. words[icount + 1] .. words[icount + 2])
@@ -173,7 +174,7 @@ function getTokens(line)
                         InsertTok("num", Cword)
                     end
                 else
-                    InsertTok("unknown_symbol", Cword)
+                    InsertTok("unknown_symbol", Cword) -- Inserts an unknown_symbol token when it does not match other types.
                 end
             end
         end
