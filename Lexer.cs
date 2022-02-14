@@ -63,7 +63,9 @@ namespace BracketScript
             // prepare execution environment
             Lexer.currentScope = new Scope("global"); // initialize global scope
             // now define base classes
-            Class Byte = new Class("byte", currentScope.CreateUnder());
+            Class Byte = new Class("byte", currentScope.CreateUnder()) {
+                size = 1
+            };
             currentScope.contained_c.Add("byte", Byte);
             // now to do a second pass on the tokens
             List<Token> secondpass = new List<Token>();
@@ -79,7 +81,7 @@ namespace BracketScript
                             if(!Lexer.currentScope.contained_c.ContainsKey(classname)) // if the class name doesn't exist, throw exception at token
                                 ret[i-1].ThrowHere(new Exception($"There was no class {classname} defined in scope {Lexer.currentScope.refid}"));
                             Class defclass = Lexer.currentScope.contained_c[classname]; // get class
-                            if(ret[i+1].t_type == Token.TokenType.eq_operator && ret[i+1].data == "(") {
+                            if(i+1 < ret.Count && ret[i+1].t_type == Token.TokenType.eq_operator && ret[i+1].data == "(") {
                                 // this means that this token has been resolved as a function definition
                                 // cool, now let's try to resolve the arguments and create a new function
                                 i+=2; // increment to argument list
@@ -96,6 +98,7 @@ namespace BracketScript
                                 };
                                 if(!currentScope.contained_v.TryAdd(v.name, v))
                                     ret[i-1].ThrowHere(new Exception($"There was already a variable {v.name} defined in scope {Lexer.currentScope.refid}"));
+                                v.Alloc(); // actually allocate variable
                             }
                         }
                         break;
