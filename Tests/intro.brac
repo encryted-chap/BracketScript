@@ -1,6 +1,6 @@
 byte c
 
-byte testFunc(byte a, byte b):
+byte testFunc(byte argument_1, byte argument_2):
     pass
 
     

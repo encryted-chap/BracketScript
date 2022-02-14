@@ -124,6 +124,7 @@ namespace BracketScript
                                 };
                                 if(!currentScope.contained_v.TryAdd(v.name, v))
                                     ret[i-1].ThrowHere(new Exception($"There was already a variable {v.name} defined in scope {Lexer.currentScope.refid}"));
+                                asm($"\n; allocate ({defclass.id}){currentScope.refid}::{v.name}");
                                 v.Alloc(); // actually allocate variable
                             }
                         } else if(ret[i+1].t_type == Token.TokenType.eq_operator && ret[i+1].data == "(") {
