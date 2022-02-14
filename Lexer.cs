@@ -56,13 +56,15 @@ namespace BracketScript
                 Debug.Message(lines_tokens);
                 foreach(var t in lines_tokens.Split("]["))
                     tc.Add(new unmanaged_token(t, cline)); // register new token collection
-
+                cline++;
                 
             }
             ret.AddRange(tc.End()); // parse unmanaged_tokens to Tokens
             // prepare execution environment
             Lexer.currentScope = new Scope("global"); // initialize global scope
-
+            // now define base classes
+            Class Byte = new Class("byte", currentScope.CreateUnder());
+            currentScope.contained_c.Add("byte", Byte);
             // now to do a second pass on the tokens
             List<Token> secondpass = new List<Token>();
             for(int i = 0; i < ret.Count; i++) {
@@ -155,7 +157,8 @@ namespace BracketScript
                     ret.Add(new Token () {
                         t_type = Enum.Parse<Token.TokenType>(tokens[i].type), // get the token type
                         data = tokens[i].data, // get the raw text data of this token
-                        indent = line_indent // get the tabs
+                        indent = line_indent, // get the tabs
+                        Line = tokens[i].line
                     });
                 }
             }
@@ -167,7 +170,7 @@ namespace BracketScript
         public static int CurrentLine; // the line this token takes place on
         public string _refid; 
         public string data; // raw text data that makes up this token (not code, config data)
-        int Line; // the line that this token takes place
+        public int Line; // the line that this token takes place
         public int indent; // the indentation present on this token
         public enum TokenType {
             eq_operator, keyword, empty_line, 
