@@ -66,7 +66,7 @@ namespace BracketScript
             // now define base classes
             Class Byte = new Class("byte", currentScope.CreateUnder()) {
                 size = 1
-            };
+            }; // todo: write function definitions for Byte
             currentScope.contained_c.Add("byte", Byte);
             // now to do a second pass on the tokens
             ret = Parse(currentScope, ret);
@@ -128,7 +128,14 @@ namespace BracketScript
                                 v.Alloc(); // actually allocate variable
                             }
                         } else if(ret[i+1].t_type == Token.TokenType.eq_operator && ret[i+1].data == "(") {
-                            // itttts a class call!
+                            // itttts a function call!
+                            if(!currentScope.contained_f.ContainsKey(ret[i].data)) {
+                                ret[i].ThrowHere(new Exception($"Scope {currentScope.refid} did not contain a definition for function {ret[i].data}"));
+                            }
+                            i+=2; // prepare for function call
+                            while(ret[i++].data != ")") {
+                                
+                            }
                         }
                         break;
                 }

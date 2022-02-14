@@ -150,7 +150,8 @@ namespace BracketScript
         // defines the asm for this code
         public void DefineASM() {
             asm($"{fullname}:");
-            Lexer.Parse(FunctionScope, toInstructions); 
+            Lexer.Parse(FunctionScope, toInstructions); // parse token instructions
+            asm(instructions.ToArray()); // allow for raw assembly
         }
         // inserts the asm for calling this function
         public void Call() {

@@ -21,16 +21,6 @@ _start:
 	sub 	eax, 0
 	mov 	byte [eax-0], 0x0
 testFunc_global:
-	
-; 	allocate (byte)zY9YYlxszj5p::argument_1
-	mov 	eax, ebp
-	sub 	eax, 1
-	mov 	byte [eax-0], 0x0
-	
-; 	allocate (byte)zY9YYlxszj5p::argument_2
-	mov 	eax, ebp
-	sub 	eax, 2
-	mov 	byte [eax-0], 0x0
 	nop
 endloop:
 jmp endloop
