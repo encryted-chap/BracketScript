@@ -52,20 +52,26 @@ namespace BracketScript
         // allocates another instance completely identical to this variable
         public Variable Copy() {
             int s_index = memory_manager.Alloc(this.retType.size); // allocate variable
-            Variable ret = this; // fill return variable with the exact same functions as this
+            Variable ret = new Variable() { // fill return variable with the exact same functions as this
+                // modify values to make it independent
+                name = string.Empty,
+                retType = this.retType,
+                stack_index = s_index,
+                isNull = this.isNull,
+            };
 
-            // modify values to make it independent
-            ret.name = string.Empty; // can't have repeating names
-            ret.stack_index = s_index; // need memory location
             // now we must use assembly to copy the memory from one var to another
+            asm($"\n; copy: {retType.classScope.refid}::{this.name} -> address [ebp-0x{s_index.ToString("X")}]"); // comment, for debugging
             asm(new string[] {
                 // point eax to this variable
                 "mov eax, ebp",
                 $"sub eax, {this.stack_index}",
                 // point ebx to ret
                 "mov ebx, ebp",
-                $"sub ebx, {s_index}"
+                $"sub ebx, {s_index}", 
+                "\n; transfer data:"
             });
+            
             for(int i = 0; i < retType.size; i++) {
                 asm (new string[] {
                     "mov dl, byte [eax]", // get byte value
@@ -80,17 +86,10 @@ namespace BracketScript
         }
         // this = v (call t* assign(v) in asm)
         public void Assign(Variable v) {
-            asm(new string[]{
-                $"mov {(v.stack_index).ToString()}, ebp",
-                $"mov ebp, {(stack_index).ToString()}"
-            });
-            for(int i = 0; i < v.retType.size; i++){
-                asm(new string[]{
-                    $"mov bx, byte [eax-{i}]",
-                    $"mov byte {stack_index+i}, bx"
-                });
-            }
-            Debug.Success("Successful write");
+            Variable clone = v.Copy();
+
+            stack_index = clone.stack_index;
+            isNull = clone.isNull;
         }
         // this = v (call t* Mul(v) in asm)
         public void Multiply(Variable v) {

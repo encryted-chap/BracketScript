@@ -1,3 +1,4 @@
 byte c
 byte b
 b = c
+byte a

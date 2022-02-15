@@ -25,9 +25,17 @@ _start:
 	mov 	eax, ebp
 	sub 	eax, 1
 	mov 	byte [eax-0], 0x0
-	mov 	0, ebp
-	mov 	ebp, 1
-	mov 	bx, byte [eax-0]
-	mov 	byte 1, bx
+	
+; 	copy: o1wJFfzvimKn:: -> address [ebp-0x2]
+	mov 	eax, ebp
+	sub 	eax, 0
+	mov 	ebx, ebp
+	sub 	ebx, 2
+
+; 	transfer data:
+	mov 	dl, byte [eax]
+	mov 	byte [ebx], dl
+	dec 	eax
+	dec 	ebx
 endloop:
 jmp endloop
