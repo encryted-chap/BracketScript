@@ -49,9 +49,34 @@ namespace BracketScript
                 isNull = true; // make sure its declared as null
             }
         }
+        // allocates another instance completely identical to this variable
+        public Variable Copy() {
+            int s_index = memory_manager.Alloc(this.retType.size); // allocate variable
+            Variable ret = this; // fill return variable with the exact same functions as this
+
+            // modify values to make it independent
+            ret.name = string.Empty; // can't have repeating names
+            ret.stack_index = s_index; // need memory location
+            // now we must use assembly to copy the memory from one var to another
+            asm(new string[] {
+                // point eax to this variable
+                "mov eax, ebp",
+                $"sub eax, {this.stack_index}",
+                // point ebx to ret
+                "mov ebx, ebp",
+                $"sub ebx, {s_index}"
+            });
+            for(int i = 0; i < retType.size; i++) {
+                asm (new string[] {
+                    "mov dl, byte [eax]", // get byte value
+                    "mov byte [ebx], dl", // store it in new val
+                    "dec eax", "dec ebx" // now decrement for the next value
+                });
+            }
+            return ret; // now we have a copied variable
+        }
         // this == v (call t* equals(v) in asm)
         public void Equals(Variable v) {
-
         }
         // this = v (call t* assign(v) in asm)
         public void Assign(Variable v) {
