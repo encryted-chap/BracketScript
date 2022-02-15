@@ -15,19 +15,12 @@ section .text
 	global 	_start
 _start:
 	mov 	esp, ebp
-	
-; 	allocate (byte)global::c
 	mov 	eax, ebp
 	sub 	eax, 0
 	mov 	byte [eax-0], 0x0
-	
-; 	allocate (byte)global::b
-	mov 	eax, ebp
-	sub 	eax, 1
-	mov 	byte [eax-0], 0x0
-	mov 	0, ebp
-	mov 	ebp, 1
+	mov 	0 edp
+	mov 	edp 0
 	mov 	bx, byte [eax-0]
-	mov 	byte 1, bx
+	mov 	byte 0, bx
 endloop:
 jmp endloop

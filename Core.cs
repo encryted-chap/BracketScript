@@ -1,7 +1,7 @@
 using System;
 
 namespace BracketScript {
-    public class Debug {
+    public static class Debug {
         public static bool TryOp (Action a) {
             try {a();}
             catch (Exception e) {
