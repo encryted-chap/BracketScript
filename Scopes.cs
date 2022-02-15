@@ -59,9 +59,9 @@ namespace BracketScript
                 stack_index = s_index,
                 isNull = this.isNull,
             };
-
+            
             // now we must use assembly to copy the memory from one var to another
-            asm($"\n; copy: {retType.classScope.refid}::{this.name} -> address [ebp-0x{s_index.ToString("X")}]"); // comment, for debugging
+            asm($"\n; copy: {Lexer.currentScope.refid}::{this.name} -> address [ebp-0x{s_index.ToString("X")}]"); // comment, for debugging
             asm(new string[] {
                 // point eax to this variable
                 "mov eax, ebp",

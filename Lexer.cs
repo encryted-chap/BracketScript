@@ -88,6 +88,7 @@ namespace BracketScript
                         got.Assign(new Variable(){
                             retType = got.retType
                         });
+                        i++;
                         break;
                     case Token.TokenType.keyword:
                         if(ret[i].data == "pass")

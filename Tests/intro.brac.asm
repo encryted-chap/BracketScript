@@ -16,7 +16,7 @@ section .text
 _start:
 	mov 	esp, ebp
 	
-; 	allocate (byte)global::c
+; 	allocate (byte)global::a
 	mov 	eax, ebp
 	sub 	eax, 0
 	mov 	byte [eax-0], 0x0
@@ -26,7 +26,7 @@ _start:
 	sub 	eax, 1
 	mov 	byte [eax-0], 0x0
 	
-; 	copy: o1wJFfzvimKn:: -> address [ebp-0x2]
+; 	copy: JJPJvH8XEdgM:: -> address [ebp-0x2]
 	mov 	eax, ebp
 	sub 	eax, 0
 	mov 	ebx, ebp
