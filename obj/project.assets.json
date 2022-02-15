@@ -49,34 +49,27 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\awkward\\.nuget\\packages\\": {},
-    "C:\\Microsoft\\Xamarin\\NuGet\\": {}
+    "C:\\Users\\evana\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\BracketScript.csproj",
+      "projectUniqueName": "C:\\Users\\evana\\Documents\\GitHub\\BracketScript\\BracketScript.csproj",
       "projectName": "BracketScript",
-      "projectPath": "C:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\BracketScript.csproj",
-      "packagesPath": "C:\\Users\\awkward\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\obj\\",
+      "projectPath": "C:\\Users\\evana\\Documents\\GitHub\\BracketScript\\BracketScript.csproj",
+      "packagesPath": "C:\\Users\\evana\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\evana\\Documents\\GitHub\\BracketScript\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Microsoft\\Xamarin\\NuGet\\"
-      ],
       "configFilePaths": [
-        "C:\\Users\\awkward\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        "C:\\Users\\evana\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net5.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Users\\nicol\\AppData\\Roaming\\Cosmos User Kit\\packages\\": {},
-        "https://api.nuget.org/v3/index.json": {},
-        "https://nuget.emzi0767.com/api/v3/index.json": {}
+        "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net5.0": {
@@ -109,18 +102,12 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.NETCore.App.Host.win-x64",
-            "version": "[5.0.13, 5.0.13]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.101\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.400\\RuntimeIdentifierGraph.json"
       }
     }
   }

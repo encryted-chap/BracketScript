@@ -55,7 +55,17 @@ namespace BracketScript
         }
         // this = v (call t* assign(v) in asm)
         public void Assign(Variable v) {
-
+            asm(new string[]{
+                $"mov {(v.stack_index).ToString()} edp",
+                $"mov edp {(stack_index).ToString()}"
+            });
+            for(int i = 0; i < v.retType.size; i++){
+                asm(new string[]{
+                    $"mov bx, byte [eax-{i}]",
+                    $"mov byte {stack_index+i}, bx"
+                });
+            }
+            Debug.Success("Successful write");
         }
         // this = v (call t* Mul(v) in asm)
         public void Multiply(Variable v) {

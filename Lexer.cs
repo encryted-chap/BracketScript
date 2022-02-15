@@ -77,6 +77,17 @@ namespace BracketScript
             List<Token> ret = toParse; 
             for(int i = 0; i < ret.Count; i++) {
                 switch(ret[i].t_type) {
+                    case Token.TokenType.eq_operator:
+                        //this means we are trying to assign something 
+                        //(a lot of this is rough rn, not dynamically decided or even really writing anything )
+                        Variable got;
+                        if(!currentScope.contained_v.TryGetValue(ret[i-1].data, out got)){
+                            ret[i--].ThrowHere(new Exception($"There was no variable {ret[i-1].data}"));
+                        }
+                        got.Assign(new Variable(){
+                            retType = got.retType
+                        });
+                        break;
                     case Token.TokenType.keyword:
                         if(ret[i].data == "pass")
                             asm("\tnop"); // this means do nothing
