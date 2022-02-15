@@ -1,7 +1,2 @@
 byte c
-
-byte testFunc():
-    pass
-testFunc()
-
-    
+b = c

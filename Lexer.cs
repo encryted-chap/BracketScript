@@ -74,6 +74,7 @@ namespace BracketScript
             return ret;
         }
         public static List<Token> Parse(Scope currentScope, List<Token> toParse) {
+            Debug.Message("Continue_Parse");
             List<Token> ret = toParse; 
             for(int i = 0; i < ret.Count; i++) {
                 switch(ret[i].t_type) {
@@ -83,7 +84,7 @@ namespace BracketScript
                         break;
                     case Token.TokenType.unknown_symbol:
                         // first we need to check if its a definition:
-                        if(ret[i+1].t_type == Token.TokenType.unknown_symbol) {
+                        if(i+1 < ret.Count && ret[i+1].t_type == Token.TokenType.unknown_symbol) {
                             // this means it is a definition
                             string classname = ret[i++].data; // get classname from token
                             string dataname = ret[i].data;
@@ -108,13 +109,15 @@ namespace BracketScript
                                 }
                                 if(ret[i].data != ":") 
                                     ret[i-1].ThrowHere(new Exception("Illegal function declaration ( maybe missing a : )")); // if it doesnt end with ':', it's not a legal function
-                                int function_indent = ret[++i].indent; 
+                                int function_indent = ret[i++].indent+4;
                                 // add instructions to function
-                                for(; i < ret.Count && ret[i].indent >= function_indent; i++) {
-                                    f.toInstructions.Add(ret[i]); 
+                                for(; i < ret.Count && (ret[i].t_type == Token.TokenType.empty_line || ret[i++].indent >= function_indent);) {
+                                    f.toInstructions.Add(ret[i++]);
                                 } 
                                 currentScope.contained_f.Add(f.fullname, f); // register function
                                 f.DefineASM();
+                                i--;
+                                continue;
                             } else {
                                 // this means that it's a Variable declaration, let's make a new variable
                                 Variable v = new Variable() {
@@ -127,16 +130,23 @@ namespace BracketScript
                                 asm($"\n; allocate ({defclass.id}){currentScope.refid}::{v.name}");
                                 v.Alloc(); // actually allocate variable
                             }
-                        } else if(ret[i+1].t_type == Token.TokenType.eq_operator && ret[i+1].data == "(") {
+                        } else if(i+1 < ret.Count && ret[i+1].t_type == Token.TokenType.eq_operator && ret[i+1].data == "(") {
                             // itttts a function call!
                             if(!currentScope.contained_f.ContainsKey(ret[i].data)) {
                                 ret[i].ThrowHere(new Exception($"Scope {currentScope.refid} did not contain a definition for function {ret[i].data}"));
-                            }
+                            } Function f = currentScope.contained_f[ret[i].data]; // get function
                             i+=2; // prepare for function call
+                            List<List<Token>> args = new List<List<Token>>(); // list of tokens, if the count of a collection is one, its a var
+                            args.Add(new List<Token>()); // just to get it started
                             while(ret[i++].data != ")") {
-                                
+                                if(ret[i].data == ",") args.Add(new List<Token>());
+                                else args[args.Count].Add(ret[i]); // append new token
                             }
+                            f.Call(); // call function
                         }
+                        break;
+                    default:
+                        Debug.Error(Enum.GetName<Token.TokenType>(ret[i].t_type));
                         break;
                 }
             }

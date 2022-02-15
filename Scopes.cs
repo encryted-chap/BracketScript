@@ -149,12 +149,15 @@ namespace BracketScript
         }
         // defines the asm for this code
         public void DefineASM() {
+            asm($"jmp end_{fullname}");
             asm($"{fullname}:");
-            Lexer.Parse(FunctionScope, toInstructions); // parse token instructions
+            toInstructions = Lexer.Parse(FunctionScope, toInstructions); // parse token instructions
             asm(instructions.ToArray()); // allow for raw assembly
+            asm($"end_{fullname}:");
         }
         // inserts the asm for calling this function
         public void Call() {
+            Debug.Message("called " + fullname);
             // loads arguments
             for(int i = 0; i < args.Length; i++) {
                 asm("mov eax, ebp"); // get stack val
@@ -165,6 +168,7 @@ namespace BracketScript
             int ret = memory_manager.Alloc(4); // allocate 4 bytes for return address
             asm("mov eax, ebp");
             asm($"sub eax, {ret}"); // point eax to allocated memory
+            asm("mov esp, eax"); // so that the address ends up in the right place
             asm($"call {fullname}"); // call function (will push return address to allocated memory)
             // clear arguments
             for(int i = 0; i < args.Length; i++) 
