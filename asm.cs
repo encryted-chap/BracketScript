@@ -26,6 +26,8 @@ namespace BracketScript {
                 string cs = c.ToString(); // just in case lol
                 asm($"xor e{cs}x, e{cs}x"); // clear current
             }
+            asm("mov esp, ebp ; restore stack");
+            asm("");
         }
     }
 }

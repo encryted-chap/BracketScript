@@ -1,3 +1,7 @@
 byte a
-byte b = a
+byte c
+byte b = a = c
+
+byte somefunc():
+    pass
 

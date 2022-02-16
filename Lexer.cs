@@ -65,7 +65,7 @@ namespace BracketScript
             Lexer.currentScope = new Scope("global"); // initialize global scope
             // now define base classes
             Class Byte = new Class("byte", currentScope.CreateUnder()) {
-                size = 1
+                size = 5
             }; // todo: write function definitions for Byte
             currentScope.contained_c.Add("byte", Byte);
             // now to do a second pass on the tokens

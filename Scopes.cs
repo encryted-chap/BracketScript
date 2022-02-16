@@ -54,7 +54,6 @@ namespace BracketScript
             int s_index = memory_manager.Alloc(this.retType.size); // allocate variable
             Variable ret = new Variable() { // fill return variable with the exact same functions as this
                 // modify values to make it independent
-                name = string.Empty,
                 retType = this.retType,
                 stack_index = s_index,
                 isNull = this.isNull,
@@ -63,22 +62,27 @@ namespace BracketScript
             // now we must use assembly to copy the memory from one var to another
             asm($"\n; copy: {Lexer.currentScope.refid}::{this.name} -> address [ebp-0x{s_index.ToString("X")}]"); // comment, for debugging
             asm(new string[] {
-                // point eax to this variable
-                "mov eax, ebp",
-                $"sub eax, {this.stack_index}",
-                // point ebx to ret
-                "mov ebx, ebp",
-                $"sub ebx, {s_index}", 
+                
+                "mov eax, ebp", // point to the base of stack
+                "mov ebx, eax", // now point ebx to base of stack
+                "",
+                $"sub eax, {this.stack_index}\t; src", // now point eax to var memory
+                $"sub ebx, {s_index}\t; dest", // now ebx too 
                 "\n; transfer data:"
             });
             
             for(int i = 0; i < retType.size; i++) {
                 asm (new string[] {
-                    "mov dl, byte [eax]", // get byte value
+                    "",
+                    $"mov dl, byte [eax] ; byte {i}", // get byte value
                     "mov byte [ebx], dl", // store it in new val
-                    "dec eax", "dec ebx" // now decrement for the next value
                 });
+                if(i+1 != retType.size) 
+                    asm(new string[] {"dec eax", "dec ebx"}); // if not last iteration, decrement
             }
+            asm("");
+            asm("; now clear regs");
+            _asm_.ClearRegs();
             return ret; // now we have a copied variable
         }
         // this == v (call t* equals(v) in asm)
