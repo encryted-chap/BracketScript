@@ -81,37 +81,46 @@ function getTokens(line)
         words[#words + 1] = word;
     end
         
-    tempLine, tempstr = ""; quit = false; local count = 1
+    tempLine, tempstr = "", ""; quit = false; local count = 1
     
+	-- If there is an array in the line
+
+	if (newLine:find("[", 1, true)) then
+		local arrayInstance = "%[" .. newLine:match("=%s*%[(.+)%]") .. "%]"
+		newLine = newLine:gsub(arrayInstance, arrayInstance:gsub(" ", ""))
+	end
+
     -- This part of the code is necessary for strings with spaces inside of them to get parsed properly
     -- as well as the concatenation of strings
 
-    for word in string.gmatch(newLine, "%S+") do
-        if quit == true then
-            break
-        end
-        if word:sub(1,1) == "\"" then
-            for i=count,#words do
-                if (words[i]:sub(#words[i],1) == "\"") or words[i + 1] == nil then
-                    tempLine = tempLine .. tempstr .. words[i]
-                    tempstr = ""
-                    quit = true
-                    break
-                else
-                    if types.eq_operator[1]:find(words[i], 1, true) then
-                        tempstr = tempstr .. words[i] .. "&!"
-                    else
-                        if types.eq_operator[1]:find(words[i + 1], 1, true) then
-                            tempstr = tempstr .. words[i] .. "&!" -- This symbol is used for the spaces that separate the two strings
-                        else
-                            tempstr = tempstr .. words[i] .. "&^" -- This symbol is used for the spaces inside of the strings
-                        end
-                    end
-                end
-                
-            end
-        end
-        count = count + 1
+	if newLine:find("\"", 1, true) then
+		for word in string.gmatch(newLine, "%S+") do
+			if quit == true then
+				break
+			end
+			if word:sub(1,1) == "\"" then
+				for i=count,#words do
+					if (words[i]:sub(#words[i],1) == "\"") or words[i + 1] == nil then
+						tempLine = tempLine .. tempstr .. words[i]
+						tempstr = ""
+						quit = true
+						break
+					else
+						if types.eq_operator[1]:find(words[i], 1, true) then
+							tempstr = tempstr .. words[i] .. "&!"
+						else
+							if types.eq_operator[1]:find(words[i + 1], 1, true) then
+								tempstr = tempstr .. words[i] .. "&!" -- This symbol is used for the spaces that separate the two strings
+							else
+								tempstr = tempstr .. words[i] .. "&^" -- This symbol is used for the spaces inside of the strings
+							end
+						end
+					end
+					
+				end
+			end
+			count = count + 1
+		end
     end
     
     -- Lua magic pattern characters that need to be escaped in order for the
@@ -164,7 +173,7 @@ function getTokens(line)
             if (types.eq_operator[1]:find(Cword, 1, true)) then
                 InsertTok("eq_operator", Cword)
             else -- If the token is not a special character/operator
-                if numChar(Cword, "\"") >= 2 then
+                if numChar(Cword, "\"") >= 2 and numChar(Cword, "[") == 0 then -- If it is a string (had to add second numChar call to make sure its not an array)
                     InsertTok("string", Cword:gsub("&^", " ")) -- Inserts a string token, replacing its space indicators with real spaces so it is normal
                 elseif type(tonumber(Cword)) == "number" then
                     if words[icount + 1] == "." and type(tonumber(words[icount + 2])) == "number" then
@@ -174,7 +183,12 @@ function getTokens(line)
                         InsertTok("num", Cword)
                     end
                 else
-                    InsertTok("unknown_symbol", Cword) -- Inserts an unknown_symbol token when it does not match other types.
+					-- If the token is an array
+					if numChar(Cword, "[") >= 1 and numChar(Cword, "]") >= 1 then
+						InsertTok("array", Cword)
+					else -- If it is not an array
+                    	InsertTok("unknown_symbol", Cword) -- Inserts an unknown_symbol token when it does not match other types.
+					end
                 end
             end
         end
