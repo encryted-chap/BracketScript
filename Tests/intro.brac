@@ -4,4 +4,6 @@ byte b = a = c
 
 byte somefunc():
     pass
+pass
+pass
 

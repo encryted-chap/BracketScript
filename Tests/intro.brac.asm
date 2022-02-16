@@ -113,5 +113,11 @@ _start:
 	xor 	edx, edx
 	mov 	esp, ebp ; restore stack
 
+	jmp 	end_somefunc_global
+somefunc_global:
+	nop
+end_somefunc_global:
+	nop
+	nop
 endloop:
 jmp endloop
