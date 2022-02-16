@@ -1,9 +1,13 @@
+byte b 
 byte a
-byte c
-byte b = a = c
-
 byte somefunc():
+    b = a
+    byte func_0():
+        byte d = b
+        pass
+    b = d
     pass
 pass
-pass
+
+
 

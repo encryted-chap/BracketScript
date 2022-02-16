@@ -119,14 +119,13 @@ namespace BracketScript
                                         }
                                     }
                                 }
-                                if(ret[i].data != ":") 
+                                if(ret[i++].data != ":") 
                                     ret[i-1].ThrowHere(new Exception("Illegal function declaration ( maybe missing a : )")); // if it doesnt end with ':', it's not a legal function
-                                int function_indent = ret[i++].indent;
+                                int function_indent = ret[i].indent;
                                 // add instructions to function
-                                for(; i < ret.Count && (ret[i].t_type == Token.TokenType.empty_line || (i+1 != ret.Count && ret[i++].indent >= function_indent)); i++) {
+                                for(; i < ret.Count && (ret[i].t_type == Token.TokenType.empty_line || (i != ret.Count && ret[i].indent >= function_indent)); i++) {
                                     f.toInstructions.Add(ret[i]);
                                 } 
-                                i--;
                                 currentScope.contained_f.Add(f.fullname, f); // register function
                                 f.DefineASM();
                                 i--;
