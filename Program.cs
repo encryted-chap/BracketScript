@@ -2,12 +2,28 @@
 using System.IO;
 using System.Reflection;
 using System.Diagnostics;
+using System.Threading;
 
 // LoPy source
 namespace BracketScript
 {
     
     public static class global {
+        static Thread timert;
+        public static long compiletime;
+        static bool timercounting=true;
+        public static void StartTimer() {
+            timert = new Thread(() => {
+                while(timercounting) {
+                    Thread.Sleep(1);
+                    compiletime++;
+                }
+            });
+            timert.Start();
+        }
+        public static void EndTimer() {
+            timercounting=false;
+        }
         // generate string id
         public static void gen_id(out string str, int size=12) {
             str = string.Empty; // reset str
@@ -34,7 +50,7 @@ namespace BracketScript
         public static List<string> ASM; // main assembly code, is written then compiled
         static string outp, inp; // used for file access (inp is source code, outp is output)
         static void Main(string[] args) {
-           
+           global.StartTimer();
             if(!Directory.Exists("lua")) Directory.CreateDirectory("lua");
             // get lua from embedded resources
             WriteResource("lexer", "lua/lexer.lua");
@@ -112,6 +128,11 @@ namespace BracketScript
             
                 
             File.Delete("nasm.exe");
+            global.EndTimer();
+            if(debug) {
+                System.Console.WriteLine($"Compile time: {global.compiletime}ms");
+                System.Console.WriteLine($"Asm instructions: {ASM.Count} lines");
+            }
             System.Environment.Exit(0);
         }
         public static void WriteResource(string resource_name, string path) {

@@ -1,13 +1,4 @@
-byte b 
-byte a
-byte somefunc():
-    b = a
-    byte func_0():
-        byte d = b
-        pass
-    b = d
-    pass
-pass
+byte b = 10
 
 
 
