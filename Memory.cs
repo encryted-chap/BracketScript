@@ -75,12 +75,13 @@ namespace BracketScript {
             int i = Find(m.index);
             if(i != -1) memory_map[i].free = true;
         }
-        public static void Free(int index) {
+        public static void Free(int stack_index) {
             // look for identical block then free
             for(int i = 0; i < memory_map.Count; i++) {
-                if(memory_map[i].index == index) 
+                if(memory_map[i].index == stack_index) 
                     memory_map[i].free = true;
             }
+            asm($"\n; freed used memory block, index={stack_index}");
         }
         // returns the index in memory_map that this mblock is located at
         public static int Find(int stack_index) {
@@ -88,7 +89,7 @@ namespace BracketScript {
                 if(memory_map[i].index == stack_index) return i;
             return -1;
         }
-        // finds the first free memory block and returns the stack index of this mblock 
+        // finds the first free memory block and returns the stack index of this mblock
         public static int Alloc(int memsize) {
             for(int i = 0; i < memory_map.Count; i++) {
                 // if memory would fit, return
@@ -107,6 +108,7 @@ namespace BracketScript {
                     } 
                     memory_map[i].size = memsize; // update block size
                     memory_map[i].free = false; // this is going to be used
+                    asm($"\n; allocated used block, index={memory_map[i].index}");
                     return memory_map[i].index;
                 }
             }
@@ -118,6 +120,7 @@ namespace BracketScript {
             };
             // prep index for the next one
             current_index += memsize;
+            asm($"\n; allocated new memory block, index={m.index}");
             memory_map.Add(m);
             return m.index;
             

@@ -1,4 +1,8 @@
-byte b = 10
-
+byte b 
+byte a
+a = b 
+byte somefunc():
+    pass
+    pass
 
 

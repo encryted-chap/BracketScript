@@ -17,41 +17,33 @@ _start:
 	mov 	esp, ebp
 	
 ; 	allocate (byte)global::b
+	
+; 	allocated new memory block, index=0
 	mov 	eax, ebp
 	sub 	eax, 0
-	mov 	dword [eax-0], dword 0x0
-	mov 	byte [eax-4], 0x0
+	mov 	byte [eax-0], 0x0
 	
-; 	copy: global:: -> address [ebp-0x5]
+; 	allocate (byte)global::a
+	
+; 	allocated new memory block, index=1
+	mov 	eax, ebp
+	sub 	eax, 1
+	mov 	byte [eax-0], 0x0
+	
+; 	freed used memory block, index=1
+	
+; 	allocated used block, index=1
+	
+; 	copy: global:: -> address [ebp-0x1]
 	mov 	eax, ebp
 	mov 	ebx, eax
 
 	sub 	eax, 0	; src
-	sub 	ebx, 5	; dest
+	sub 	ebx, 1	; dest
 
 ; 	transfer data:
 
 	mov 	dl, byte [eax] ; byte 0
-	mov 	byte [ebx], dl
-	dec 	eax
-	dec 	ebx
-
-	mov 	dl, byte [eax] ; byte 1
-	mov 	byte [ebx], dl
-	dec 	eax
-	dec 	ebx
-
-	mov 	dl, byte [eax] ; byte 2
-	mov 	byte [ebx], dl
-	dec 	eax
-	dec 	ebx
-
-	mov 	dl, byte [eax] ; byte 3
-	mov 	byte [ebx], dl
-	dec 	eax
-	dec 	ebx
-
-	mov 	dl, byte [eax] ; byte 4
 	mov 	byte [ebx], dl
 
 	; 	now clear regs
@@ -61,5 +53,10 @@ _start:
 	xor 	edx, edx
 	mov 	esp, ebp ; restore stack
 
+	jmp 	end_somefunc_global
+somefunc_global:
+	nop
+	nop
+end_somefunc_global:
 endloop:
 jmp endloop

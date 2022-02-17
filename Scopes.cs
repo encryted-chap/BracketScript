@@ -7,10 +7,10 @@ namespace BracketScript
 
     
     public class Variable {
-        public string name;
-        public Class retType;
-        public int stack_index;
-        public bool isNull=true;
+        public string name; 
+        public Class retType; // the class type of this variable
+        public int stack_index; // where this variable is allocated on the stack
+        public bool isNull=true; // set if this variable is not allocated
 
         // loads a pointer to this variable to an assembly register
         public void LoadPtr(_asm_.Regs register = _asm_.Regs.eax) {
@@ -90,10 +90,15 @@ namespace BracketScript
         }
         // this = v (call t* assign(v) in asm)
         public void Assign(Variable v) {
-            Variable clone = v.Copy();
+            if(v.retType.id == this.retType.id) {
+                memory_manager.Free(this.stack_index); // free var
+                Variable clone = v.Copy(); // clone variable
 
-            stack_index = clone.stack_index;
-            isNull = clone.isNull;
+                stack_index = clone.stack_index; // point this variable to v clone
+                isNull = clone.isNull; // if the clone is null this should be too
+            } else {
+                asm("; not implemented exception");
+            }
         }
         // this = v (call t* Mul(v) in asm)
         public void Multiply(Variable v) {
