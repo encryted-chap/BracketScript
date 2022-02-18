@@ -33,6 +33,44 @@ function getTokens(line)
     end
     InsertTok("indent", count)
 
+	-- If the line is a preproc
+	if line:sub(1,1) == "#" then
+		-- These are for strings with spaces
+		local check = false
+		local tmps = ""
+		
+		for word in string.gmatch(line, "%S+") do
+			-- Used to put strings with spaces all together
+			if check == true then
+				if word:sub(#word, #word) == "\"" then
+					check = false
+					InsertTok("string", tmps .. word)
+				else
+					tmps = tmps .. word .. " "
+				end
+			else
+				-- If it doesnt have a string with a space then continue normally
+				-- This will detect what type it is and insert it
+				if word:sub(1,1) == "\"" and word:sub(#word, #word) ~= "\"" then
+					check = true
+					tmps = tmps .. word .. " "
+				elseif word:sub(1,1) == "\"" and word:sub(#word, #word) == "\"" then
+					InsertTok("string", word)
+				elseif type(tonumber(word)) == "number" and numChar(word, ".") > 0 then
+					InsertTok("float_num", word)
+				elseif type(tonumber(word)) == "number" and numChar(word, ".") == 0 then
+					InsertTok("num", word)
+				elseif word:sub(1,1) == "#" then
+					InsertTok("preproc", word)
+				else
+					InsertTok("unknown_operator", word)
+				end
+			end
+		end
+		-- Return the tokenized output without continuing the program
+		return output
+	end
+
     types = {
         keyword={
             "pass while if for break continue return global def"
