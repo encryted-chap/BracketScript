@@ -10,31 +10,31 @@ namespace BracketScript {
         public bool free; // set if this memory block is not allocated
 
         public void WriteB(byte b, int offset, bool selected=false) {
-            if(!selected)
-                asm (new string[] {
-                    "mov eax, ebp",
-                    $"sub eax, {index}",
-                    $"mov byte [eax-{offset}], 0x{b.ToString("X")}"
+            if(!selected) {
+                _asm_.point(index);
+                asm(new string[] {
+                    $"mov byte [esp-{offset}], byte 0x{b.ToString("X")}"
                 });
-            else asm($"mov byte [eax-{offset}], 0x{b.ToString("X")}");
+            }
+            else asm($"mov byte [esp-{offset}], byte 0x{b.ToString("X")}");
         }
         public void WriteW(ushort word, int offset, bool selected=false) {
-            if(!selected)
+           if(!selected) {
+                _asm_.point(index);
                 asm(new string[] {
-                    "mov eax, ebp",
-                    $"sub eax, {index}",
-                    $"mov word [eax-{offset}], word 0x{word.ToString("X")}"
+                    $"mov dword [esp-{offset}], dword 0x{word.ToString("X")}"
                 });
-            else asm($"mov word [eax-{offset}], word 0x{word.ToString("X")}");
+            }
+            else asm($"mov word [esp-{offset}], word 0x{word.ToString("X")}");
         }
         public void WriteD(uint dword, int offset, bool selected=false) {
-            if(!selected)
+            if(!selected) {
+                _asm_.point(index);
                 asm(new string[] {
-                    "mov eax, ebp",
-                    $"sub eax, {index}",
-                    $"mov dword [eax-{offset}], dword 0x{dword.ToString("X")}"
+                    $"mov dword [esp-{offset}], dword 0x{dword.ToString("X")}"
                 });
-            else asm($"mov dword [eax-{offset}], dword 0x{dword.ToString("X")}");
+            }
+            else asm($"mov dword [esp-{offset}], dword 0x{dword.ToString("X")}");
         }
         public void Write(byte[] data) {
             bool sel = false;

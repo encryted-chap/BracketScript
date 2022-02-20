@@ -16,19 +16,16 @@ section .text
 _start:
 	mov 	esp, ebp
 	
-; 	allocate (byte)global::b
-	
-; 	allocated new memory block, index=0
-	mov 	eax, ebp
-	sub 	eax, 0
-	mov 	byte [eax-0], 0x0
-	
 ; 	allocate (byte)global::a
 	
+; 	allocated new memory block, index=0
+	mov 	byte [esp-0], byte 0x0
+	
+; 	allocate (byte)global::b
+	
 ; 	allocated new memory block, index=1
-	mov 	eax, ebp
-	sub 	eax, 1
-	mov 	byte [eax-0], 0x0
+	sub 	esp, 1
+	mov 	byte [esp-0], byte 0x0
 	
 ; 	freed used memory block, index=1
 	
@@ -53,10 +50,5 @@ _start:
 	xor 	edx, edx
 	mov 	esp, ebp ; restore stack
 
-	jmp 	end_somefunc_global
-somefunc_global:
-	nop
-	nop
-end_somefunc_global:
 endloop:
 jmp endloop

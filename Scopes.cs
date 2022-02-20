@@ -12,13 +12,9 @@ namespace BracketScript
         public int stack_index; // where this variable is allocated on the stack
         public bool isNull=true; // set if this variable is not allocated
 
-        // loads a pointer to this variable to an assembly register
-        public void LoadPtr(_asm_.Regs register = _asm_.Regs.eax) {
-            asm(new string[] {
-                "mov eax, ebp",
-                $"sub eax, {stack_index}", // point to addr
-                $"mov {_asm_.RegName(register)}, eax" // load to reg
-            });
+        // point esp to this stack index
+        public void LoadPtr() {
+            _asm_.point(this.stack_index);
         }
 
         // allocates then stores this var into memory
@@ -28,10 +24,10 @@ namespace BracketScript
             
             int offset = 0; // byte offset for storing to memory
             foreach(var b in Class.GetBytes(this)) {
-                b.LoadPtr(_asm_.Regs.eax); // point eax to byte
+                b.LoadPtr(); // point esp to byte
                 // write to block
                 asm(new string[] {
-                    "mov al, byte [eax]", // get byte value
+                    "mov al, byte [esp]", // get byte value
                     $"mov byte [0x{(stack_index+offset).ToString("X")}], al" // store byte value and increment index
                 });
                 offset++; // increment offset accordingly
