@@ -1,3 +1,5 @@
 byte a
-byte b = a
+byte b 
+byte c
 
+b = c

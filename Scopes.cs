@@ -48,37 +48,24 @@ namespace BracketScript
         // allocates another instance completely identical to this variable
         public Variable Copy() {
             int s_index = memory_manager.Alloc(this.retType.size); // allocate variable
-            Variable ret = new Variable() { // fill return variable with the exact same functions as this
-                // modify values to make it independent
-                retType = this.retType,
-                stack_index = s_index,
-                isNull = this.isNull,
-            };
+            Variable ret = new Variable(); // fill return variable with the exact same functions as this
+            ret.stack_index = s_index;
             
             // now we must use assembly to copy the memory from one var to another
             asm($"\n; copy: {Lexer.currentScope.refid}::{this.name} -> address [ebp-0x{s_index.ToString("X")}]"); // comment, for debugging
-            asm(new string[] {
-                
-                "mov eax, ebp", // point to the base of stack
-                "mov ebx, eax", // now point ebx to base of stack
-                "",
-                $"sub eax, {this.stack_index}\t; src", // now point eax to var memory
-                $"sub ebx, {s_index}\t; dest", // now ebx too 
-                "\n; transfer data:"
-            });
+            // copy [this.stack_index] -> [s_index]
+            this.LoadPtr(); 
+            asm("mov esi, esp"); // set source reg 
+            ret.LoadPtr();
+            asm("mov edi, esp"); // set dest reg
             
-            for(int i = 0; i < retType.size; i++) {
-                asm (new string[] {
-                    "",
-                    $"mov dl, byte [eax] ; byte {i}", // get byte value
-                    "mov byte [ebx], dl", // store it in new val
-                });
-                if(i+1 != retType.size) 
-                    asm(new string[] {"dec eax", "dec ebx"}); // if not last iteration, decrement
-            }
-            asm("");
-            asm("; now clear regs");
-            _asm_.ClearRegs();
+            // now transfer data:
+            asm(new string[] {
+                $"mov ecx, {this.retType.size}", // how many bytes to move
+                "\tstd", // set direction flag (copy backwards)
+                "rep movsb", // move data
+                "\tcld" // now clear the direction flag, just for fun
+            });
             return ret; // now we have a copied variable
         }
         // this == v (call t* equals(v) in asm)

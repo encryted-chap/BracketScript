@@ -19,8 +19,7 @@ namespace BracketScript {
         }
         // points esp to a new location
         public static void point(int stack_index) {
-            int operation = -(esp_current - stack_index);
-            if(operation == 0) return; // already pointing here
+            int operation = (stack_index - esp_current);
 
             if(operation < 0) asm($"add esp, {-operation}"); // point in the oppisite direction
             else asm($"sub esp, {operation}"); // else move forward on stack
