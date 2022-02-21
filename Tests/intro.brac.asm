@@ -16,36 +16,20 @@ section .text
 _start:
 	mov 	esp, ebp
 	
-; 	allocate (byte)global::a
-	
 ; 	allocated new memory block, index=0
+	jmp 	end_testfunc_global
+testfunc_global:
+	
+; 	allocate (byte)fWuL5auN1WH2::b
+	
+; 	allocated new memory block, index=4
+	sub 	esp, 4
+	mov 	byte [esp-0], byte 0x0
+	add 	esp, 4
+	ret
+end_testfunc_global:
+	nop
 	sub 	esp, 0
-	mov 	byte [esp-0], byte 0x0
-	
-; 	allocate (byte)global::b
-	
-; 	allocated new memory block, index=1
-	sub 	esp, 1
-	mov 	byte [esp-0], byte 0x0
-	
-; 	allocate (byte)global::c
-	
-; 	allocated new memory block, index=2
-	sub 	esp, 1
-	mov 	byte [esp-0], byte 0x0
-	
-; 	freed used memory block, index=1
-	
-; 	allocated used block, index=1
-	
-; 	copy: global:: -> address [ebp-0x1]
-	add 	esp, 2
-	mov 	esi, esp
-	sub 	esp, 1
-	mov 	edi, esp
-	mov 	ecx, 1
-	std
-	rep 	movsb
-	cld
+	call 	testfunc_global
 endloop:
 jmp endloop

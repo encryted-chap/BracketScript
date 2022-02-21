@@ -154,6 +154,7 @@ namespace BracketScript
         public List<string> instructions=new List<string>(); // the assembly code of this Function
         public List<Token> toInstructions=new List<Token>(); // list of tokens to be converted to assembly
         public string fullname, name; // identifiers of function
+        mblock ret_addrs; // the constant reserved space for this return address
 
         public Class return_type; // the return type of this function
         public Variable[] args; // arguments passed to this function
@@ -161,6 +162,7 @@ namespace BracketScript
         public Function(string name, Scope s, Variable[] args=null) {
             FunctionScope = s.inheritall(new Scope()); // create new inherited scope
             fullname = $"{name}_{s.refid}"; // assign fullname to avoid errors
+            this.name = name;
             if(!object.Equals(args, null)) {
                 // check if args are already defined in current scope
                 foreach(Variable a in args) {
@@ -172,6 +174,10 @@ namespace BracketScript
                 }
                 
             }
+            // now define the return address mem block
+            int rs_index = memory_manager.Alloc(4); // get stack index
+            int mmap_index = memory_manager.Find(rs_index); // get the index in memory_map
+            ret_addrs = memory_manager.memory_map[mmap_index]; // now get the memory block
         }
         // defines the asm for this code
         public void DefineASM() {
@@ -179,27 +185,30 @@ namespace BracketScript
             asm($"{fullname}:");
             toInstructions = Lexer.Parse(FunctionScope, toInstructions); // parse token instructions
             asm(instructions.ToArray()); // allow for raw assembly
+
+            // now manditory return protocol:
+            _asm_.point(ret_addrs.index); // point to return address
+            asm("\tret"); // and return
+
             asm($"end_{fullname}:");
         }
         // inserts the asm for calling this function
         public void Call() {
-            Debug.Message("called " + fullname);
-            // loads arguments
-            for(int i = 0; i < args.Length; i++) {
-                asm("mov eax, ebp"); // get stack val
-                asm($"sub eax, {args[i].stack_index}"); // point to address
-                asm($"mov [arg{i}], eax"); // store variable address
+            if(!object.Equals(null, args)) {
+                // loads arguments
+                for(int i = 0; i < args.Length; i++) {
+                    asm("mov eax, ebp"); // get stack val
+                    asm($"sub eax, {args[i].stack_index}"); // point to address
+                    asm($"mov [arg{i}], eax"); // store variable address
+                }
             }
-            // set up stack such that address doesnt overwrite allocated memory
-            int ret = memory_manager.Alloc(4); // allocate 4 bytes for return address
-            asm("mov eax, ebp");
-            asm($"sub eax, {ret}"); // point eax to allocated memory
-            asm("mov esp, eax"); // so that the address ends up in the right place
+            _asm_.point(ret_addrs.index); // point for call
             asm($"call {fullname}"); // call function (will push return address to allocated memory)
-            // clear arguments
-            for(int i = 0; i < args.Length; i++) 
-                asm($"mov dword [arg{i}], 0");
-            memory_manager.Free(ret); // free address memory
+            if(!object.Equals(null, args)) {
+                // clear arguments
+                for(int i = 0; i < args.Length; i++) 
+                    asm($"mov dword [arg{i}], 0");
+            }
         }
     }
     public class Class {

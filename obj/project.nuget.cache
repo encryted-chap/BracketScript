@@ -1,11 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "iCwHpRStzPDT/zsHFcncUJRU1GMRHXE1ISq5K9ChiA3xlK9kc1b+DSB6KjNsqb2BO7VitUG5vpnu9LIMQI7BdQ==",
+  "dgSpecHash": "2UhQr4eQZbIaSok52erzAryEy3GVlWTpBuyc+7ssgBGrUJQDqqw7SWeGwz5js1kFa4/kWird913EpUNfnlgS7Q==",
   "success": true,
-  "projectFilePath": "C:\\Users\\awkward\\Desktop\\Project Folders\\C#\\BracketScript\\BracketScript.csproj",
+  "projectFilePath": "/home/awkward/BracketScript/BracketScript.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\awkward\\.nuget\\packages\\moonsharp\\2.0.0\\moonsharp.2.0.0.nupkg.sha512",
-    "C:\\Users\\awkward\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.13\\microsoft.netcore.app.host.win-x64.5.0.13.nupkg.sha512"
+    "/home/awkward/.nuget/packages/moonsharp/2.0.0/moonsharp.2.0.0.nupkg.sha512"
   ],
   "logs": []
 }

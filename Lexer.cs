@@ -80,16 +80,19 @@ namespace BracketScript
             for(int i = 0; i < ret.Count; i++) {
                 switch(ret[i].t_type) {
                     case Token.TokenType.eq_operator:
-                        //this means we are trying to assign something 
-                        //(a lot of this is rough rn, not dynamically decided or even really writing anything )
-                        Variable got;
-                        if(!currentScope.contained_v.TryGetValue(ret[i-1].data, out got)){
-                            ret[i--].ThrowHere(new Exception($"There was no variable {ret[i-1].data}"));
+                        if(ret[i].data == "=") {
+                            //this means we are trying to assign something 
+                            //(a lot of this is rough rn, not dynamically decided or even really writing anything )
+                            Variable got;
+                            if(!currentScope.contained_v.TryGetValue(ret[i-1].data, out got)){
+                                ret[i--].ThrowHere(new Exception($"There was no variable {ret[i-1].data}"));
+                            }
+                            got.Assign(new Variable(){
+                                retType = got.retType
+                            });
+                            i++;
                         }
-                        got.Assign(new Variable(){
-                            retType = got.retType
-                        });
-                        i++;
+                        
                         break;
                     case Token.TokenType.keyword:
                         if(ret[i].data == "pass")
@@ -127,7 +130,7 @@ namespace BracketScript
                                 for(; i < ret.Count && (ret[i].t_type == Token.TokenType.empty_line || (i != ret.Count && ret[i].indent >= function_indent)); i++) {
                                     f.toInstructions.Add(ret[i]);
                                 } 
-                                currentScope.contained_f.Add(f.fullname, f); // register function
+                                currentScope.contained_f.Add(f.name, f); // register function
                                 f.DefineASM();
                                 i--;
                                 continue;
@@ -145,6 +148,7 @@ namespace BracketScript
                             }
                         } else if(i+1 < ret.Count && ret[i+1].t_type == Token.TokenType.eq_operator && ret[i+1].data == "(") {
                             // itttts a function call!
+                            Debug.Success("Calling name");
                             if(!currentScope.contained_f.ContainsKey(ret[i].data)) {
                                 ret[i].ThrowHere(new Exception($"Scope {currentScope.refid} did not contain a definition for function {ret[i].data}"));
                             } Function f = currentScope.contained_f[ret[i].data]; // get function

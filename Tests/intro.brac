@@ -1,5 +1,4 @@
-byte a
-byte b 
-byte c
-
-b = c
+byte testfunc():
+    byte b
+pass
+testfunc()
