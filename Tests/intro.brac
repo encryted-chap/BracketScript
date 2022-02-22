@@ -1,4 +1,4 @@
 byte testfunc():
     byte b
-pass
 testfunc()
+byte c

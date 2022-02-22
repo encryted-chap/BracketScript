@@ -159,6 +159,7 @@ namespace BracketScript
                                 if(ret[i].data == ",") args.Add(new List<Token>());
                                 else args[args.Count].Add(ret[i]); // append new token
                             }
+                            i--; // just make sure
                             f.Call(); // call function
                         }
                         break;

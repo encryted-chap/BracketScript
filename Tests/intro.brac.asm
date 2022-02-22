@@ -20,7 +20,7 @@ _start:
 	jmp 	end_testfunc_global
 testfunc_global:
 	
-; 	allocate (byte)fWuL5auN1WH2::b
+; 	allocate (byte)kciMyVrL1PCS::b
 	
 ; 	allocated new memory block, index=4
 	sub 	esp, 4
@@ -28,8 +28,14 @@ testfunc_global:
 	add 	esp, 4
 	ret
 end_testfunc_global:
-	nop
+	; 	call function testfunc_global
 	sub 	esp, 0
 	call 	testfunc_global
+	
+; 	allocate (byte)global::c
+	
+; 	allocated new memory block, index=5
+	sub 	esp, 5
+	mov 	byte [esp-0], byte 0x0
 endloop:
 jmp endloop

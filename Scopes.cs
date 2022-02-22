@@ -194,6 +194,7 @@ namespace BracketScript
         }
         // inserts the asm for calling this function
         public void Call() {
+            asm("; call function " + fullname);
             if(!object.Equals(null, args)) {
                 // loads arguments
                 for(int i = 0; i < args.Length; i++) {
