@@ -5,7 +5,6 @@ namespace BracketScript {
     using static global;
     
     public static class _asm_ {
-        static int malloc_index;
         public static int esp_current=0; // the index esp is currently pointing at
         
         // enumerated registers for easy access

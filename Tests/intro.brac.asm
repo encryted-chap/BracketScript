@@ -20,7 +20,7 @@ _start:
 	jmp 	end_testfunc_global
 testfunc_global:
 	
-; 	allocate (byte)kciMyVrL1PCS::b
+; 	allocate (byte)K4MapS6uLcIv::b
 	
 ; 	allocated new memory block, index=4
 	sub 	esp, 4
