@@ -94,7 +94,8 @@ function getTokens(line)
             -- Check if the character is a special character (non-alphanumeric)
             if types.eq_operator[1]:find(chr, 1, true) then
                 if i == #line then
-                    newLine = newLine .. chr
+		    -- Experimental Line, DO NOT TOUCH
+                    newLine = newLine .. " " .. chr
                 else
                     x = " "
                     newLine = newLine .. " " .. chr .. " "
