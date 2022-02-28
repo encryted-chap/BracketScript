@@ -110,31 +110,46 @@ namespace BracketScript
                             string dataname = ret[i].data;
                             // resolve the class
                             if(!currentScope.contained_c.ContainsKey(classname)) // if the class name doesn't exist, throw exception at token
-                                ret[i-1].ThrowHere(new Exception($"There was no class {classname} defined in scope {Lexer.currentScope.refid}"));
+                                ret[i-1].ThrowHere(new Exception($"There was no class {classname} defined in scope {currentScope.refid}"));
                             Class defclass = currentScope.contained_c[classname]; // get class
                             if(i+1 < ret.Count && ret[i+1].t_type == Token.TokenType.eq_operator && ret[i+1].data == "(") {
                                 // this means that this token has been resolved as a function definition
                                 // cool, now let's try to resolve the arguments and create a new function
                                 Function f = new Function(ret[i].data, currentScope, null); // initialize
                                 i+=1; // increment to argument list
-                                List<Token> fdec = new List<Token>();
-                                while(ret[i++].data != ")") {
-                                    if(ret[i].data == "," || ret[i].data == "(") continue; 
+
+                                // resolve args
+                                List<Variable> template_args = new List<Variable>();
+
+                                while(ret[i].data != ")") {
+                                    if(ret[i].data == "," || ret[i].data == "(") {
+                                        i++;
+                                        continue;
+                                    } 
                                     else {
-                                        if(ret[i].t_type == Token.TokenType.unknown_symbol) {
-                                            ret[i].indent++; // make sure to add this indent
-                                            f.toInstructions.Add(ret[i]); // append declarations to the beginning of function
-                                        }
+                                        Variable arg = new Variable(); // define dummy variable
+
+                                        // if class wasn't resolved, throw
+                                        if(!currentScope.contained_c.TryGetValue(ret[i].data, out arg.retType))
+                                            ret[i].ThrowHere(new Exception($"There was no class {ret[i].data} defined in scope {currentScope.refid}"));
+                                        arg.name = ret[++i].data;
+
+                                        template_args.Add(arg);
+                                        Debug.Success($"Added argument {arg.retType.id}:{arg.name} to {f.name}");
                                     }
+                                    i++;
                                 }
-                                if(ret[i++].data != ":") 
+                                i++;
+                                f.arg_template = template_args.ToArray();
+                                if(ret[i].data != ":") 
                                     ret[i-1].ThrowHere(new Exception("Illegal function declaration ( maybe missing a : )")); // if it doesnt end with ':', it's not a legal function
-                                int function_indent = ret[i].indent;
+                                int function_indent = ret[i+1].indent;
                                 // add instructions to function
                                 for(; i < ret.Count && (ret[i].t_type == Token.TokenType.empty_line || (i != ret.Count && ret[i].indent >= function_indent)); i++) {
                                     f.toInstructions.Add(ret[i]);
                                 } 
                                 currentScope.contained_f.Add(f.name, f); // register function
+                                Debug.Success("Added " + f.name);
                                 f.DefineASM();
                                 i--;
                                 continue;
@@ -153,12 +168,13 @@ namespace BracketScript
                         } else if(i+1 < ret.Count && ret[i+1].t_type == Token.TokenType.eq_operator && ret[i+1].data == "(") {
                             // function call
                             Debug.Success($"Calling {ret[i].data}");
-                            Function toCall = currentScope.contained_f[ret[i++].data]; // fetch the function
+                            Function toCall = currentScope.contained_f[ret[i].data]; // fetch the function
                             Debug.Success($"Fetched function {toCall.fullname}");
                             
-                            int throwindex = i-1;
+                            int throwindex = i++; // for use later
+
                             // check arguments
-                            if(ret[++i].t_type == Token.TokenType.eq_operator && ret[i].data == ")") {
+                            if(ret[i].t_type == Token.TokenType.eq_operator && ret[i].data == ")") {
                                 // no arg call
                                 if(!toCall.ArgsCheck()) { // no args
                                     ret[i-2].ThrowHere(new ArgumentException());
@@ -168,11 +184,15 @@ namespace BracketScript
                                 }
                             } else {
                                 List<Variable> args = new List<Variable>(); // argument list to pass
-                                for(; ret[i].data != ")"; i++) {
+                                for(i++; ret[i].data != ")"; i++) {
                                     // get args
+                                    args.Add(currentScope.contained_v[ret[i].data]);
                                 }
                                 if(!toCall.ArgsCheck(args.ToArray())) {
                                     ret[throwindex].ThrowHere(new ArgumentException());
+                                } else {
+                                    toCall.args = args.ToArray(); // assign arguments
+                                    toCall.Call(); // now call function
                                 }
                             }
 

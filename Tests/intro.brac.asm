@@ -19,24 +19,22 @@ _start:
 ; 	allocated new memory block, index=0
 	jmp 	end_func_global
 func_global:
+	sub 	esp, 0
+	ret
+end_func_global:
+	nop
 	
-; 	allocate (byte)NGtUgwf9oYdw::b
+; 	allocate (byte)global::a
 	
 ; 	allocated new memory block, index=4
 	sub 	esp, 4
 	mov 	byte [esp-0], byte 0x0
-	nop
-	add 	esp, 4
-	ret
-end_func_global:
-	
-; 	allocate (byte)global::a
-	
-; 	allocated new memory block, index=5
-	sub 	esp, 5
-	mov 	byte [esp-0], byte 0x0
 	; 	call function func_global
-	add 	esp, 5
+	mov 	eax, ebp
+	sub 	eax, 4
+	mov 	[arg0], eax
+	add 	esp, 4
 	call 	func_global
+	mov 	dword [arg0], 0
 endloop:
 jmp endloop
