@@ -20,7 +20,7 @@ _start:
 	jmp 	end_func_global
 func_global:
 	
-; 	allocate (byte)ZbCEl5WczDgO::b
+; 	allocate (byte)NGtUgwf9oYdw::b
 	
 ; 	allocated new memory block, index=4
 	sub 	esp, 4

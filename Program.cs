@@ -49,13 +49,14 @@ namespace BracketScript
     {
         public static List<string> ASM; // main assembly code, is written then compiled
         static string outp, inp; // used for file access (inp is source code, outp is output)
+        public static bool debug = false;
         static void Main(string[] args) {
            global.StartTimer();
             if(!Directory.Exists("lua")) Directory.CreateDirectory("lua");
             // get lua from embedded resources
             WriteResource("lexer", "lua/lexer.lua");
 
-            bool debug = false;
+            
             // initialization code
             ASM = new List<string>() {
                 "section .data",

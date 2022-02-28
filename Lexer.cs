@@ -59,7 +59,10 @@ namespace BracketScript
                     tc.Add(new unmanaged_token(t, cline)); // register new token collection
                 cline++;
                 
+                
             }
+
+            Console.Clear();
             ret.AddRange(tc.End()); // parse unmanaged_tokens to Tokens
             // prepare execution environment
             Lexer.currentScope = new Scope("global"); // initialize global scope

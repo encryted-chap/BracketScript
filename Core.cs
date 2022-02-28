@@ -15,6 +15,8 @@ namespace BracketScript {
             return true;
         }
         public static void WriteCol(string msg, ConsoleColor c) {
+            if(!Program.debug) return;
+            
             Console.ForegroundColor = c;
             Console.Write(msg);
             Console.ResetColor();
@@ -25,11 +27,16 @@ namespace BracketScript {
             Console.Write($"] {msg}\n");
         }
         public static void Success(string msg) {
+            
+            if(!Program.debug) return;
+
             Console.Write("[ ");
             WriteCol("SUCCESS ", ConsoleColor.Green);
             Console.Write($"] {msg}\n");
         }
         public static void Message(string msg) {
+            if(!Program.debug) return;
+            
             Console.Write("[ ");
             WriteCol("INFO ", ConsoleColor.Magenta);
             Console.Write($" ] {msg}\n");
