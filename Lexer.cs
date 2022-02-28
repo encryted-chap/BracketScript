@@ -91,7 +91,8 @@ namespace BracketScript
                                 retType = got.retType
                             });
                             i++;
-                        }
+                            break;
+                        } 
                         
                         break;
                     case Token.TokenType.keyword:
@@ -147,20 +148,31 @@ namespace BracketScript
                                 v.Alloc(); // actually allocate variable
                             }
                         } else if(i+1 < ret.Count && ret[i+1].t_type == Token.TokenType.eq_operator && ret[i+1].data == "(") {
-                            // itttts a function call!
-                            Debug.Success("Calling name");
-                            if(!currentScope.contained_f.ContainsKey(ret[i].data)) {
-                                ret[i].ThrowHere(new Exception($"Scope {currentScope.refid} did not contain a definition for function {ret[i].data}"));
-                            } Function f = currentScope.contained_f[ret[i].data]; // get function
-                            i+=2; // prepare for function call
-                            List<List<Token>> args = new List<List<Token>>(); // list of tokens, if the count of a collection is one, its a var
-                            args.Add(new List<Token>()); // just to get it started
-                            while(ret[i++].data != ")") {
-                                if(ret[i].data == ",") args.Add(new List<Token>());
-                                else args[args.Count].Add(ret[i]); // append new token
+                            // function call
+                            Debug.Success($"Calling {ret[i].data}");
+                            Function toCall = currentScope.contained_f[ret[i++].data]; // fetch the function
+                            Debug.Success($"Fetched function {toCall.fullname}");
+                            
+                            int throwindex = i-1;
+                            // check arguments
+                            if(ret[++i].t_type == Token.TokenType.eq_operator && ret[i].data == ")") {
+                                // no arg call
+                                if(!toCall.ArgsCheck()) { // no args
+                                    ret[i-2].ThrowHere(new ArgumentException());
+                                } else {
+                                    Debug.Success("Arguments correct, calling...");
+                                    toCall.Call(); // call function
+                                }
+                            } else {
+                                List<Variable> args = new List<Variable>(); // argument list to pass
+                                for(; ret[i].data != ")"; i++) {
+                                    // get args
+                                }
+                                if(!toCall.ArgsCheck(args.ToArray())) {
+                                    ret[throwindex].ThrowHere(new ArgumentException());
+                                }
                             }
-                            i--; // just make sure
-                            f.Call(); // call function
+
                         }
                         break;
                     default:

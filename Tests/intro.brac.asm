@@ -17,25 +17,26 @@ _start:
 	mov 	esp, ebp
 	
 ; 	allocated new memory block, index=0
-	jmp 	end_testfunc_global
-testfunc_global:
+	jmp 	end_func_global
+func_global:
 	
-; 	allocate (byte)K4MapS6uLcIv::b
+; 	allocate (byte)ZbCEl5WczDgO::b
 	
 ; 	allocated new memory block, index=4
 	sub 	esp, 4
 	mov 	byte [esp-0], byte 0x0
+	nop
 	add 	esp, 4
 	ret
-end_testfunc_global:
-	; 	call function testfunc_global
-	sub 	esp, 0
-	call 	testfunc_global
+end_func_global:
 	
-; 	allocate (byte)global::c
+; 	allocate (byte)global::a
 	
 ; 	allocated new memory block, index=5
 	sub 	esp, 5
 	mov 	byte [esp-0], byte 0x0
+	; 	call function func_global
+	add 	esp, 5
+	call 	func_global
 endloop:
 jmp endloop

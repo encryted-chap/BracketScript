@@ -158,11 +158,14 @@ namespace BracketScript
 
         public Class return_type; // the return type of this function
         public Variable[] args; // arguments passed to this function
+        public Variable[] arg_template; // template containing the types for this function
         public Scope FunctionScope;
         public Function(string name, Scope s, Variable[] args=null) {
             FunctionScope = s.inheritall(new Scope()); // create new inherited scope
             fullname = $"{name}_{s.refid}"; // assign fullname to avoid errors
             this.name = name;
+
+            List<Variable> atemplate=new List<Variable>();
             if(!object.Equals(args, null)) {
                 // check if args are already defined in current scope
                 foreach(Variable a in args) {
@@ -170,6 +173,8 @@ namespace BracketScript
                     if(FunctionScope.contained_v.ContainsKey(a.name)) {
                         // should always be caught by ThrowHere()
                         throw new System.Exception("Scope already contains a definition for variable " + a.name); // throw if Var exists
+                    } else {
+                        atemplate.Add(a); // register variable
                     }
                 }
                 
@@ -178,6 +183,24 @@ namespace BracketScript
             int rs_index = memory_manager.Alloc(4); // get stack index
             int mmap_index = memory_manager.Find(rs_index); // get the index in memory_map
             ret_addrs = memory_manager.memory_map[mmap_index]; // now get the memory block
+        }
+        // checks an argument collection and returns true if they are valid
+        public bool ArgsCheck(Variable[] args=null) {
+            // if both are null, return true
+            if(object.Equals(args, null)) 
+                return object.Equals(arg_template, null);
+            else {
+                // check the count
+                if(args.Length != arg_template.Length)
+                    return false;
+                // check the class types
+                for(int i = 0; i < args.Length; i++) {
+                    // if class type doesnt match, return false
+                    if(args[i].retType.id != arg_template[i].retType.id)
+                        return false;
+                }
+                return true;
+            }
         }
         // defines the asm for this code
         public void DefineASM() {
