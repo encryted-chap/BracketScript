@@ -221,9 +221,13 @@ namespace BracketScript
             if(!object.Equals(null, args)) {
                 // loads arguments
                 for(int i = 0; i < args.Length; i++) {
-                    asm("mov eax, ebp"); // get stack val
-                    asm($"sub eax, {args[i].stack_index}"); // point to address
-                    asm($"mov [arg{i}], eax"); // store variable address
+                    Variable toAdd = args[i]; // get new reference
+
+                    // register argument in function scope
+                    if(FunctionScope.contained_v.ContainsKey(arg_template[i].name)) {
+                        FunctionScope.contained_v[arg_template[i].name] = args[i].Copy(); // register
+                    } else 
+                        FunctionScope.contained_v.Add(arg_template[i].name, args[i].Copy());
                 }
             }
             _asm_.point(ret_addrs.index); // point for call

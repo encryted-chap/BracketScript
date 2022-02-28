@@ -30,10 +30,19 @@ end_func_global:
 	sub 	esp, 4
 	mov 	byte [esp-0], byte 0x0
 	; 	call function func_global
-	mov 	eax, ebp
-	sub 	eax, 4
-	mov 	[arg0], eax
-	add 	esp, 4
+	
+; 	allocated new memory block, index=5
+	
+; 	copy: global::a -> address [ebp-0x5]
+	sub 	esp, 0
+	mov 	esi, esp
+	sub 	esp, 1
+	mov 	edi, esp
+	mov 	ecx, 1
+	std
+	rep 	movsb
+	cld
+	add 	esp, 5
 	call 	func_global
 	mov 	dword [arg0], 0
 endloop:

@@ -191,6 +191,7 @@ namespace BracketScript
                                 if(!toCall.ArgsCheck(args.ToArray())) {
                                     ret[throwindex].ThrowHere(new ArgumentException());
                                 } else {
+                                    // add arguments to function
                                     toCall.args = args.ToArray(); // assign arguments
                                     toCall.Call(); // now call function
                                 }
