@@ -59,9 +59,8 @@ namespace BracketScript
             
             // initialization code
             ASM = new List<string>() {
-                "section .data",
+                
                 "",
-                "section .text",
                 "global _start", // for the linker
                 "_start:", // entry point
                 "mov esp, ebp", // initialize stack
@@ -69,8 +68,7 @@ namespace BracketScript
             };
             global.sec_dat("tempret: dd 0"); // used for passing the return value
             // used for passing arguments (automated for convenience)
-            for(int i = 0; i < 10; i++) 
-                global.sec_dat($"arg{i}: dd 0");
+            
             outp = inp = string.Empty; // null reference proof :)
             // parse the command line arguments
             for(int i = 0; i < args.Length; i++) {
@@ -78,7 +76,7 @@ namespace BracketScript
                     default:
                         // if it's none of the following args, it means that its an input file
                         inp = args[i];
-                        var tokens = Lexer.Lexify(args[i]);
+                        
                         break;
                     case "--output": case "-o":
                         // select output
@@ -90,6 +88,8 @@ namespace BracketScript
                         break;
                 }
             }
+            Lexer.Lexify(inp);
+            
             // format assembly
             for(int i = 0; i < ASM.Count; i++) {
                 // just make it pretty in a few ways

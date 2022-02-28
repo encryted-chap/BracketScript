@@ -186,7 +186,7 @@ namespace BracketScript
                                 List<Variable> args = new List<Variable>(); // argument list to pass
                                 for(i++; ret[i].data != ")"; i++) {
                                     // get args
-                                    args.Add(currentScope.contained_v[ret[i].data]);
+                                    args.Add(currentScope.contained_v[ret[i].data]); // add var
                                 }
                                 if(!toCall.ArgsCheck(args.ToArray())) {
                                     ret[throwindex].ThrowHere(new ArgumentException());

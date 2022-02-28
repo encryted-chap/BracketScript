@@ -1,4 +1,3 @@
-byte func(byte b):
-    pass
-byte a
-func( a )
+byte func():
+    pass 
+func()

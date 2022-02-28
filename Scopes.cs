@@ -232,11 +232,6 @@ namespace BracketScript
             }
             _asm_.point(ret_addrs.index); // point for call
             asm($"call {fullname}"); // call function (will push return address to allocated memory)
-            if(!object.Equals(null, args)) {
-                // clear arguments
-                for(int i = 0; i < args.Length; i++) 
-                    asm($"mov dword [arg{i}], 0");
-            }
         }
     }
     public class Class {
