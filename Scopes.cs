@@ -79,13 +79,15 @@ namespace BracketScript
         }
         // this = v (call t* assign(v) in asm)
         public void Assign(Variable v) {
-            if(v.retType.id == this.retType.id) {
+            if(v.retType.id == retType.id) {
+                
                 memory_manager.Free(this.stack_index); // free var
                 Variable clone = v.Copy(); // clone variable
 
                 stack_index = clone.stack_index; // point this variable to v clone
                 isNull = clone.isNull; // if the clone is null this should be too
             } else {
+                Debug.Message("assigning");
                 asm("; not implemented exception");
                 string search_word_global = string.Empty;
                 for(int i = 0; i < 10; i++) {

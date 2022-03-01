@@ -68,10 +68,23 @@ namespace BracketScript
             Lexer.currentScope = new Scope("global"); // initialize global scope
             // now define base classes
             Class Byte = new Class("byte", currentScope.CreateUnder()) {
-                size = 1
+                size = 1,
             }; // todo: write function definitions for Byte
-            
+
+            Class integer = new Class("int", currentScope.CreateUnder()) {
+                size = 4, // 32 bit
+            };
+            Function byte_new_int = new Function("new", Byte.classScope, new Variable[] {new Variable() {name="n", retType=integer}}); // todo: int variable type
+            byte_new_int.instructions = new List<string>() {
+                
+            };
+            Byte.classScope.contained_f.Add(byte_new_int.name, byte_new_int);
             currentScope.contained_c.Add("byte", Byte);
+            currentScope.contained_c.Add("int", integer);
+            
+            foreach(var v in Byte.classScope.contained_f) {
+                v.Value.DefineASM();
+            }
             // now to do a second pass on the tokens
             ret = Parse(currentScope, ret);
             
