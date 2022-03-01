@@ -56,7 +56,9 @@ namespace BracketScript
             asm($"\n; copy: {Lexer.currentScope.refid}::{this.name} -> address [ebp-0x{s_index.ToString("X")}]"); // comment, for debugging
             // copy [this.stack_index] -> [s_index]
             this.LoadPtr(); 
-            asm("mov esi, esp"); // set source reg 
+            asm("");
+            asm("mov esi, esp"); // set source reg
+            asm(""); 
             ret.LoadPtr();
             asm("mov edi, esp"); // set dest reg
             
@@ -64,8 +66,11 @@ namespace BracketScript
             asm(new string[] {
                 $"mov ecx, {this.retType.size}", // how many bytes to move
                 "\tstd", // set direction flag (copy backwards)
+                "", // for formatting
                 "rep movsb", // move data
-                "\tcld" // now clear the direction flag, just for fun
+                "\tcld", // now clear the direction flag, just for fun
+                "; endcopy",
+                ""
             });
             return ret; // now we have a copied variable
         }
@@ -82,6 +87,38 @@ namespace BracketScript
                 isNull = clone.isNull; // if the clone is null this should be too
             } else {
                 asm("; not implemented exception");
+                string search_word_global = string.Empty;
+                for(int i = 0; i < 10; i++) {
+                    string sw;
+                    Function f = null; // tocall
+                    if(i != 0) {
+                        sw = $"new_{i}"+search_word_global;
+                    } else {
+                        sw = "new";
+                    }
+                    // find function and check function arguments 
+                    if(v.retType.classScope.contained_f.TryGetValue(sw, out f) && f.ArgsCheck(new Variable[] {v})) {
+                        // found function
+                        f.args = new Variable[] {v}; // add variable as argument
+                        f.Call(); // call function
+                        
+                        // address to return value is in tempret
+                        // copy returned variable values to this variable
+                        asm(new string[] {
+                            "mov eax, [tempret]",
+                            "mov esi, eax", // source addrs
+                        });
+                        _asm_.point(this.stack_index); // point here
+                        asm(new string[] {
+                            "mov edi, esp", // address of this variable
+                            $"mov ecx, {this.retType.size}", // length
+                            "",
+                            "std", // copy backwards
+                            "rep movsb", // copy
+                            "cld" // clear direction flag 
+                        });
+                    }
+                }
             }
         }
         // this = v (call t* Mul(v) in asm)
