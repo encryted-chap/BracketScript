@@ -44,6 +44,7 @@ namespace BracketScript
                 if(!m.free) memory_manager.Free(m); // if not already free, free
                 isNull = true; // make sure its declared as null
             }
+            asm("; dealloc variable " + name); // for debug
         }
         // allocates another instance completely identical to this variable
         public Variable Copy() {
@@ -227,11 +228,17 @@ namespace BracketScript
                     if(FunctionScope.contained_v.ContainsKey(arg_template[i].name)) {
                         FunctionScope.contained_v[arg_template[i].name] = args[i].Copy(); // register
                     } else 
-                        FunctionScope.contained_v.Add(arg_template[i].name, args[i].Copy());
+                        FunctionScope.contained_v.Add(arg_template[i].name, args[i].Copy()); // create entry then register
                 }
             }
             _asm_.point(ret_addrs.index); // point for call
             asm($"call {fullname}"); // call function (will push return address to allocated memory)
+            // now dealloc variables
+            for(int i = 0; i < arg_template.Length; i++) {
+                Variable toRm = FunctionScope.contained_v[arg_template[i].name]; // fetch variable
+                toRm.Free(); // free variable
+                FunctionScope.contained_v[arg_template[i].name] = arg_template[i]; // reset function template
+            }
         }
     }
     public class Class {
