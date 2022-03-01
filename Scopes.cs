@@ -80,7 +80,7 @@ namespace BracketScript
         // this = v (call t* assign(v) in asm)
         public void Assign(Variable v) {
             if(v.retType.id == retType.id) {
-                
+                Debug.Message($"{v.retType.id} == {this.retType.id}");
                 memory_manager.Free(this.stack_index); // free var
                 Variable clone = v.Copy(); // clone variable
 
@@ -88,8 +88,9 @@ namespace BracketScript
                 isNull = clone.isNull; // if the clone is null this should be too
             } else {
                 Debug.Message("assigning");
-                asm("; not implemented exception");
+                
                 string search_word_global = string.Empty;
+                bool found=false;
                 for(int i = 0; i < 10; i++) {
                     string sw;
                     Function f = null; // tocall
@@ -119,8 +120,12 @@ namespace BracketScript
                             "rep movsb", // copy
                             "cld" // clear direction flag 
                         });
+                        found=true;
                     }
-                }
+                    
+                }if(!found) {
+                        asm("; not implemented exception");
+                    }
             }
         }
         // this = v (call t* Mul(v) in asm)
@@ -230,16 +235,21 @@ namespace BracketScript
             if(object.Equals(args, null)) 
                 return object.Equals(arg_template, null);
             else {
+                // if args passed are not null and arg_template is, false
+                if(object.Equals(arg_template, null)) 
+                    return false;
                 // check the count
                 if(args.Length != arg_template.Length)
                     return false;
+                bool correct=true;
                 // check the class types
                 for(int i = 0; i < args.Length; i++) {
                     // if class type doesnt match, return false
-                    if(args[i].retType.id != arg_template[i].retType.id)
-                        return false;
+                    if(args[i].retType.id != arg_template[i].retType.id) {
+                        correct=false;
+                    }
                 }
-                return true;
+                return correct;
             }
         }
         // defines the asm for this code

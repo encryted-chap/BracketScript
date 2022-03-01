@@ -81,7 +81,7 @@ namespace BracketScript
             Byte.classScope.contained_f.Add(byte_new_int.name, byte_new_int);
             currentScope.contained_c.Add("byte", Byte);
             currentScope.contained_c.Add("int", integer);
-            
+
             foreach(var v in Byte.classScope.contained_f) {
                 v.Value.DefineASM();
             }
@@ -100,12 +100,14 @@ namespace BracketScript
                             //this means we are trying to assign something 
                             //(a lot of this is rough rn, not dynamically decided or even really writing anything )
                             Variable got;
+                            Variable toAssign;
                             if(!currentScope.contained_v.TryGetValue(ret[i-1].data, out got)){
                                 ret[i--].ThrowHere(new Exception($"There was no variable {ret[i-1].data}"));
                             }
-                            got.Assign(new Variable(){
-                                retType = got.retType
-                            });
+                            if(!currentScope.contained_v.TryGetValue(ret[i+1].data, out toAssign)) {
+                                ret[i--].ThrowHere(new Exception($"There was no variable {ret[i+1].data}"));
+                            }
+                            got.Assign(toAssign);
                             i++;
                             break;
                         } 
