@@ -93,14 +93,15 @@ namespace BracketScript
                 bool found=false;
                 for(int i = 0; i < 10; i++) {
                     string sw;
-                    Function f = null; // tocall
+                    Function f; // tocall
                     if(i != 0) {
                         sw = $"new_{i}"+search_word_global;
                     } else {
                         sw = "new";
                     }
+                    Debug.Message($"searching for: {sw} in class {v.retType.id}");
                     // find function and check function arguments 
-                    if(v.retType.classScope.contained_f.TryGetValue(sw, out f) && f.ArgsCheck(new Variable[] {v})) {
+                    if(v.retType.classScope.contained_f.TryGetValue(sw, out f) && v.retType.classScope.contained_f[sw].ArgsCheck(new Variable[] {v})) {
                         // found function
                         f.args = new Variable[] {v}; // add variable as argument
                         f.Call(); // call function
@@ -121,6 +122,9 @@ namespace BracketScript
                             "cld" // clear direction flag 
                         });
                         found=true;
+                        break;
+                    } else {
+                        Debug.Error("not found.");
                     }
                     
                 }if(!found) {
@@ -175,7 +179,7 @@ namespace BracketScript
                 s = inheritf(s); // functions,
             if(contained_v.Count != 0)
                 s = inheritv(s); // and variables
-            s.Indentation = this.Indentation+1; // make sure to insert proper indentation 
+            s.Indentation = this.Indentation+4; // make sure to insert proper indentation 
             return s; // assimilated scope :P
         }
         Scope inheritv(Scope s) {
@@ -233,6 +237,7 @@ namespace BracketScript
         public bool ArgsCheck(Variable[] args=null) {
             // if both are null, return true
             if(object.Equals(args, null)) 
+                // test argument format
                 return object.Equals(arg_template, null);
             else {
                 // if args passed are not null and arg_template is, false

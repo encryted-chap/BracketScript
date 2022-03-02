@@ -1,4 +1,4 @@
 
-int main():
-    pass 
-main()
+byte b 
+int i 
+b = i

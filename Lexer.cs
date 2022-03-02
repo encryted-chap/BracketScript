@@ -74,11 +74,12 @@ namespace BracketScript
             Class integer = new Class("int", currentScope.CreateUnder()) {
                 size = 4, // 32 bit
             };
-            Function byte_new_int = new Function("new", Byte.classScope, new Variable[] {new Variable() {name="n", retType=integer}}); // todo: int variable type
+            Function byte_new_int = new Function("new", Lexer.currentScope, new Variable[] {new Variable() {name="n", retType=integer}}); // todo: int variable type
             byte_new_int.instructions = new List<string>() {
-                
+                "nop",
             };
-            Byte.classScope.contained_f.Add(byte_new_int.name, byte_new_int);
+            Byte.classScope.contained_f.Add("new", byte_new_int);
+            
             currentScope.contained_c.Add("byte", Byte);
             currentScope.contained_c.Add("int", integer);
 
@@ -91,7 +92,7 @@ namespace BracketScript
             return ret;
         }
         public static List<Token> Parse(Scope currentScope, List<Token> toParse) {
-            Debug.Message("Continue_Parse");
+            
             List<Token> ret = toParse; 
             for(int i = 0; i < ret.Count; i++) {
                 switch(ret[i].t_type) {
@@ -101,10 +102,10 @@ namespace BracketScript
                             //(a lot of this is rough rn, not dynamically decided or even really writing anything )
                             Variable got;
                             Variable toAssign;
-                            if(!currentScope.contained_v.TryGetValue(ret[i-1].data, out got)){
+                            if(!currentScope.contained_v.TryGetValue(ret[i-1].data, out toAssign)){
                                 ret[i--].ThrowHere(new Exception($"There was no variable {ret[i-1].data}"));
                             }
-                            if(!currentScope.contained_v.TryGetValue(ret[i+1].data, out toAssign)) {
+                            if(!currentScope.contained_v.TryGetValue(ret[i+1].data, out got)) {
                                 ret[i--].ThrowHere(new Exception($"There was no variable {ret[i+1].data}"));
                             }
                             got.Assign(toAssign);
