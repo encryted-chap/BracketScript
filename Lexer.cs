@@ -74,9 +74,13 @@ namespace BracketScript
             Class integer = new Class("int", currentScope.CreateUnder()) {
                 size = 4, // 32 bit
             };
-            Function byte_new_int = new Function("new", Lexer.currentScope, new Variable[] {new Variable() {name="n", retType=integer}}); // todo: int variable type
+            Function byte_new_int = new Function("new", Byte.classScope, new Variable[] {new Variable() {name="n", retType=integer}}); // todo: int variable type
             byte_new_int.instructions = new List<string>() {
                 "nop",
+                "mov eax, 0",
+                "mov ebx, 0",
+                "mov ecx, 0",
+                "mov edx, 0"
             };
             Byte.classScope.contained_f.Add("new", byte_new_int);
             

@@ -101,7 +101,8 @@ namespace BracketScript
                     }
                     Debug.Message($"searching for: {sw} in class {v.retType.id}");
                     // find function and check function arguments 
-                    if(v.retType.classScope.contained_f.TryGetValue(sw, out f) && v.retType.classScope.contained_f[sw].ArgsCheck(new Variable[] {v})) {
+                    if(v.retType.classScope.contained_f.TryGetValue(sw, out f)) {
+                        f = v.retType.classScope.contained_f[sw];
                         // found function
                         f.args = new Variable[] {v}; // add variable as argument
                         f.Call(); // call function
@@ -128,8 +129,8 @@ namespace BracketScript
                     }
                     
                 }if(!found) {
-                        asm("; not implemented exception");
-                    }
+                    asm("; not implemented exception");
+                }
             }
         }
         // this = v (call t* Mul(v) in asm)
@@ -273,9 +274,9 @@ namespace BracketScript
         // inserts the asm for calling this function
         public void Call() {
             asm("; call function " + fullname);
-            if(!object.Equals(null, args)) {
+            if(!object.Equals(null, arg_template)) {
                 // loads arguments
-                for(int i = 0; i < args.Length; i++) {
+                for(int i = 0; i < arg_template.Length; i++) {
                     Variable toAdd = args[i]; // get new reference
 
                     // register argument in function scope
@@ -287,12 +288,15 @@ namespace BracketScript
             }
             _asm_.point(ret_addrs.index); // point for call
             asm($"call {fullname}"); // call function (will push return address to allocated memory)
-            // now dealloc variables
-            for(int i = 0; i < arg_template.Length; i++) {
-                Variable toRm = FunctionScope.contained_v[arg_template[i].name]; // fetch variable
-                toRm.Free(); // free variable
-                FunctionScope.contained_v[arg_template[i].name] = arg_template[i]; // reset function template
+            if(!object.Equals(null, arg_template)) {
+                // now dealloc variables
+                for(int i = 0; i < arg_template.Length; i++) {
+                    Variable toRm = FunctionScope.contained_v[arg_template[i].name]; // fetch variable
+                    toRm.Free(); // free variable
+                    FunctionScope.contained_v[arg_template[i].name] = arg_template[i]; // reset function template
+                }
             }
+            
         }
     }
     public class Class {
