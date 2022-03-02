@@ -103,10 +103,10 @@ namespace BracketScript
                             Variable got;
                             Variable toAssign;
                             if(!currentScope.contained_v.TryGetValue(ret[i-1].data, out toAssign)){
-                                ret[i--].ThrowHere(new Exception($"There was no variable {ret[i-1].data}"));
+                                ret[i].ThrowHere(new Exception($"There was no variable1 {ret[i-1].data}"));
                             }
                             if(!currentScope.contained_v.TryGetValue(ret[i+1].data, out got)) {
-                                ret[i--].ThrowHere(new Exception($"There was no variable {ret[i+1].data}"));
+                                ret[i].ThrowHere(new Exception($"There was no variable2 {ret[i+1].data}"));
                             }
                             got.Assign(toAssign);
                             i++;

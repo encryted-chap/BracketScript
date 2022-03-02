@@ -1,4 +1,3 @@
-
-byte b 
+byte b
 int i 
 b = i
