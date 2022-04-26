@@ -1,8 +1,0 @@
-{
-  "runtimeOptions": {
-    "additionalProbingPaths": [
-      "/home/awkward/.dotnet/store/|arch|/|tfm|",
-      "/home/awkward/.nuget/packages"
-    ]
-  }
-}

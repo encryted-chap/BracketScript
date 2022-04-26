@@ -1,4 +1,0 @@
-byte c = 10
-
-int Main():
-    pass
