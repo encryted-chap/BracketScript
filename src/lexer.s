@@ -2,120 +2,65 @@ extern strlen, malloc
 global lexer
 
 %define TOKEN_SIZE 0x8
+extern malloc, free
 
 section .text
 
-;;;
-; struct _token
-; uint32_t line (0x0)
-; char *raw (0x4)
-
+;::::::::::::::::::::::::::;.
+;     struct _token       ;||
+;;;;;;;;;;;;;;;;;;;;;;;;;;;||
+; uint8_t flags -- (0x00) ;||
+; char *line ----- (0x01) ;||
+; uint8_t t_type - (0x05) ;||
+; uint16_t line -- (0x06) ;||
+;;;;;;;;;;;;;;;;;;;;;;;;;;;||
+`````````````````````````````
 ; a function dedicated to cutting up a line
 ; into useable chunks
-lexer: ; struct _token lexer(char* line)
-	; check if lexer initialized
-	mov dl, byte [lexer_init] ; store init byte
-	cmp dl, 0x0 ; if dl == 0, call .lexer_i
-	je .lexer_i
-
-.get_vals
-	pop dword [lexer_ret] ; store ret address
-
-	push dword [esp] ; clone line for arg
-	call len ; get line length
-
-	pop ecx ; length
-	pop eax ; line
-
-	; reserve space for token
-	push TOKEN_SIZE
-	call malloc ; reserve space
-
-	; returns void*
-	pop ebx
-
-	; return
-	push dword [lexer_ret]
-	ret
-.lexer_i
-
-	; end initialization:
-	xor edx, edx
-	jmp .get_vals
-
-len: ; int len(char*)
-	pop edx
-	pop eax
+lexer: ; struct _token *lexer(char* line)
+	pop dword [lexer_ret.addr] ; pop address
+	push dword [esp] ; clone char*
 	
-	; zero result
-	xor ebx, ebx
-.loop:
-	; if [eax] == 0, end
-	cmp byte [eax], 0
-	je .end
+	call strlen ; returns int
+	pop ecx ; get length
 
-	inc eax ; increment
-	inc ebx ; inc result
-	jmp .loop ; jump up to loop
+	cmp ecx, 0 ; if len = 0,
+	je .end ; end function
+
+	pusha ; prep for malloc
+
+	mov ebx, 4*30 ; size of _token* x num of max tokens per line
+	push ebx ; size_t size
+
+	call malloc ; allocate memory
+	pop dword [lexer_ret.ret_val] ; store void*
+
+	popa ; restore registers
+	
 .end:
-	push ebx ; result
-	push edx ; ret
-
+	push dword [lexer_ret.ret_val] ; push _token**
+	push dword [lexer_ret.addr] ; push ret addr
+	
 	ret ; return
 
-find: ; int find(char* text, char* substring);
-	pop dword [lexer_ret.find] ; ret addr
-	pop eax ; text
-	pop ebx ; substring
-
-	xor ecx, ecx ; zero result
+strlen: ; int strlen(char*)
+	pop edx ; addr
+	pop eax ; char*
+	
+	xor ebx, ebx ; zero result
 .loop:
-	mov dl, byte [eax] ; get char from substring
-	cmp dl, byte [ebx] ; compare
-	je .compare
+	cmp byte [eax], 0x0 ; check for null terminator
+	je .end ; end
 
+	; increment count and line
 	inc eax
-	jmp .loop
-
-.compare:
-	pusha ; store regs
-
-.cmploop:
-	; increment
 	inc ebx
-	inc eax
-
-	cmp byte [ebx], 0
-	je .cmploop_f
-
-	mov dl, byte [eax]
-	cmp dl, byte [ebx]
-	jne .cmploop_nf
-
-	jmp .cmploop
-.cmploop_nf:
-	popa
-
-	; increment for next iteration and ret
-	inc eax
-	jmp .loop
-.cmploop_f:
-	popa ; restore regs
-	jmp .end ; end
-
-.not_found:
-	mov ecx, -1
+	jmp .loop ; end
 .end:
-	push ecx
-	push edx
-
+	push edx 
 	ret
+	
 section .data
-lexer_init: db 0
-
 lexer_ret:
-	dd 0
-.retval:
-	dd 0
-.find:
-	dd 0
+	.addr: dd 0
+	.ret_val: dd 0
