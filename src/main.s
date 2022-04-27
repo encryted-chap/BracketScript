@@ -13,72 +13,78 @@ main:
 	mov ecx, eax
 	mov edx, eax
 
-	; get provided arguments
-	pop dword [main_ret] ; store return address
+	mov dword [main_ret.retcode], eax ; zero out retcode
+	pop dword [main_ret] ; store ret addr
 	
-	pop ecx ; int
-	dec ecx ; remove result for path
-
-	pop dword [current_path] ; path to this executeable
+	pop ecx ; store number of args
+	dec ecx ; remove # for path
 	
-	; arguments are now pushed on the stack,
-	; retrieve and parse them
-.loop:
+	; if 0 args, return
 	cmp ecx, 0
 	je .end
-
-	pop eax ; pop argument to eax
-	cmp byte [eax], '-' ; check if switch or file path
-	je .handle_switch ; handle switch
-
-	; file, open and pass to lexer
-	push io_perm.read ; const char *mode
-	push eax ; const char *filename
-
-	call fopen ; opens and returns FILE*
-	pop dword [tfile] ; store file
 	
-	cmp dword [tfile], 0 ; zero on error
-	je .end ; kill program (todo turn into error msg)
+	pop dword [current_path] ; store path to program
 
+	; stack now holds argument values.
+	; parse arguments now
+.args:
+	jecxz .end ; end when ecx = 0
+	
+	pop eax ; get char* to arg
+	
+	; check for error on eax
+	push dword [main_ret.retcode] ; store og retcode
+	mov dword [main_ret.retcode], 0x5 ; set error (arguments invalid error 0x5)
+
+	cmp eax, ebx ; check if eax=0
+	je .end ; (end will handle error)
+
+	not ebx
+	cmp eax, ebx ; check if eax=FFFFFFFF
+	je .end
+
+	; no errors, restore retcode
+	pop dword [main_ret.retcode]
+
+	cmp byte [eax], '-' ; if eax[0] == '-', its a switch
+	je .switch
+
+	
+	; this means its a file! open file
 	pusha ; store regs
-	; since this is now without error,
-	; pass file to be executed
-	push dword [tfile] ; FILE*
-	call pass_file ; returns nothing
 
-	push dword [tfile] ; FILE*
-	call fclose ; close file
-	pop ebx ; should = 0
-	; continue
-	popa ; restore
-	dec ecx
-	jmp .loop
-	
-.handle_switch:
-	pusha ; save regs
+	mov ebx, io_perm.read ; get char* of "r"
+	push ebx ; mode
+	push eax ; char* path
 
+	call fopen ; open file (returns FILE*)
+
+	pop dword [tfile] ; get FILE*
 	popa ; restore regs
-	dec ecx ; make sure to skip this one
-	jmp .loop ; go back to looping
+	; continue loop:
+	dec ecx ; decrement ecx
+	jmp .args ; jump back to loop
 
 .end:
-	push 0
+	push dword [main_ret.retcode] ; return code
 	push dword [main_ret] ; restore ret address
 	ret ; return
 
+.switch:
+	; handle switch
 section .data
 tfile:
 	dd 0
 io_perm:
-.read: db "r+",0
+.read: db "r",0
 .write: db "w",0,0,0
 
 current_path:
 	dd 0
 main_ret:
 	dd 0
-
+.retcode:
+	dd 0
 error:
 	db "FATAL, return=%d:",0x0A,"|--> %s",0
 
