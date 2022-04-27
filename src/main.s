@@ -61,23 +61,56 @@ main:
 
 	pop dword [tfile] ; get FILE*
 	popa ; restore regs
+
+	; check for error:
+	push dword [main_ret.retcode] ; store retcode
+	mov dword [main_ret.retcode], 0x3 ; file not found error
+
+	cmp dword [tfile], 0 ; if tfile == 0, error
+	je .end ; let end handle error
+
+	pop dword [main_ret.retcode] ; restore retcode
+	
+	; pass tfile to pass_file
+	pusha ; store regs
+	push dword [tfile] ; push FILE*
+
+	call pass_file ; pass FILE*
+	popa ; restore regs
+
 	; continue loop:
 	dec ecx ; decrement ecx
 	jmp .args ; jump back to loop
-
+	
 .end:
+	; check for and handle errors
+	mov eax, [main_ret.retcode] ; get retcode
+
+	cmp eax, 0 ; no errors
+	je .ret ; return 0
+
+	cmp eax, 0x3 ; file not found error
+	; je file_nf
+
+	jmp .ret ; end (no support)
+
+.ret:
 	push dword [main_ret.retcode] ; return code
 	push dword [main_ret] ; restore ret address
 	ret ; return
 
 .switch:
 	; handle switch
+
+	dec ecx
+	jmp .args ; continue
 section .data
 tfile:
 	dd 0
 io_perm:
+	; permissions for file io:
 .read: db "r",0
-.write: db "w",0,0,0
+.write: db "w",0
 
 current_path:
 	dd 0
