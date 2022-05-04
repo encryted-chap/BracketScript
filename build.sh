@@ -14,7 +14,8 @@ function compile_c {
 }
 
 compile_s */*.s
-compile_c */*.c
 
 gcc */*.o -w -o bs -m32 -I lib
 rm */*.o
+
+./bs $@
