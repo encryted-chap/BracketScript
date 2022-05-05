@@ -65,6 +65,67 @@ get_global: ; scope_t *get_global()
 	mov eax, dword [global_scope] ; return scope
 	ret
 
+add_child: ; int add_child(scope_t *s, scope_t *child)
+	; check for null arguments
+	push dword [esp+4] ; pass s
+
+	call scope_null ; check if null
+	add esp, 4 ; cleanup stack
+
+	cmp eax, 0 ; set if null
+	jne .err
+
+	; check again for child
+	push dword [esp+8]
+
+	call scope_null ; check if null
+	add esp, 4 ; cleanup stack
+
+	cmp eax, 0 ; set if null
+	jne .err
+
+	;; now both are not null, add child
+
+	; allocate new buffer 
+	xor ecx, ecx ; free up eax
+
+	mov ebx, [esp+4] ; get s
+	mov cl, [ebx + (scope_t.chlen - scope_t)] ; get chlen
+
+	inc cl ; chlen++
+
+	mov eax, 4
+	mul ecx ; eax = 4*ecx 
+
+	push eax
+	call malloc ; allocate
+
+	add esp, 4 ; clean stack
+
+	mov edi, eax ; offload void* to dest reg
+	mov ebx, [esp+4] ; ebx = s
+
+	mov esi, [ebx + (scope_t.child - scope_t)] ; store child (scope_t**)
+	sub dword [esp-4], 4 ; prevent segfault
+	mov ecx, [esp-4] ; grab count
+
+	rep movsb ; copy s.child to new buffer
+	mov ebx, [esp-4] ; restore len
+
+	mov eax, [esp+8] ; grab new child
+	mov dword [esi+ebx], eax ; place in .child
+
+	jmp .no_err
+.err:
+	mov eax, 1
+	jmp .return
+.no_err:
+	xor eax, eax
+	jmp .return
+
+.return:
+	ret
+
 section .data
 
 _g: db "global",0
