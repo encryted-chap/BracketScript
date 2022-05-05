@@ -1,6 +1,6 @@
 section .text
 global main
-extern create_scope, fopen, printf
+extern get_global, fopen, printf
 
 main:
 	; clear up registers:
@@ -10,17 +10,11 @@ main:
 	mov edx, eax
 
 	; skip path
-	inc dword [esp+4] ; int argc
+	dec dword [esp+4] ; int argc
 	add dword [esp+8],4 ; char **argv
 
-	jecxz .return ; end if no arguments (to do, make this a help screen)
-
-	; increment past path
-	add eax, 4
-	dec ecx
-
-	mov dword [esp+8], eax ; store skipped path
-	mov dword [esp+4], ecx ; store arg len
+	cmp dword [esp+4], 0
+	je .return ; return if no args
 
 .args: ; parse
 	; restore values
@@ -50,6 +44,10 @@ main:
 
 .iterate:
 	add dword [esp+8], 4 ; iterate to next char*
+
+	cmp dword [esp+4], 0
+	je .return
+
 	dec dword [esp+4] ; int -= 1
 
 	jmp .args ; continue
@@ -66,30 +64,39 @@ main:
 .skipnl:
 	xor eax, eax ; return 0
 	ret
+
 .switch:
-	inc ebx ; increment char*
-	mov dl, [ebx] ; grab char value
+	; grab input value
+	mov eax, [esp+8] ; current char*
+	add eax, 4 ; next char*
+
+	cmp byte [ebx+1], 'o'
+	je .out
 
 	jmp .iterate
-; sets the input file program-wide
-set_input: ; FILE *set_input(char*)
-	; setup subroutine
-	push ebp
-	mov ebp, esp
 
-	; clear up regs
-	xor ebx, ebx
-	mov ecx, ebx
-	mov edx, ebx
+;; SWITCH FUNCTIONS
 
-	push io_perm.rp
-	push dword [ebp+8] ; push filename
+.out:
+	; eax = output file
 
-	call fopen ; open file
-	add esp, 4 ; clean up stack
+	push io_perm.w ; pass write perms
+	push eax ; pass file
 
-	pop ebp ; restore ebp
-	ret ; return
+	call fopen ; create & open file
+	add esp, 8 ; clean up stack
+
+	cmp eax, 0 ; nullptr = error
+	je .return ; todo: implement error
+
+	mov dword [file.out], eax ; store FILE*
+
+	; iterate twice
+	dec dword [esp+4] ; dec arg count
+	add dword [esp+8], 4 ; increment to file
+
+	jmp .iterate ; continue
+
 section .data
 
 io_perm:
@@ -106,3 +113,4 @@ print_strings:
 .chr: db "%c",0
 
 file: dd 0
+.out: dd 0

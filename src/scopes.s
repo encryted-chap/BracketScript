@@ -1,21 +1,10 @@
 section .text
 extern malloc
 
-global create_scope
+global get_global, create_scope
+
 %define SIZE_SCOPE_T 14
-
-struc scope_t
-	.parent: resd 1 ; scope_t*
-	.child: resd 1 ; scope_t**
-
-	.chlen: resb 1 ; uint8_t, # of children
-	.refid: resd 1 ; char*
-
-	.type: resb 1 ; uint8_t
-	.typeptr: resd 1 ; void*
-
-	.size:
-endstruc
+%include "lib/scopes.s" ; for structs
 
 scope_null: ; int scope_null(scope_t*)
 	mov eax, [esp+4] ; get scope
@@ -56,3 +45,27 @@ create_scope: ; scope_t *create_scope(scope_t *parent, char *name)
 
 	mov eax, ebx ; eax = scope_t*
 	ret ; return
+
+; returns a pointer to the global scope
+get_global: ; scope_t *get_global()
+	cmp dword [global_scope], 0
+	jne .return
+
+	; initialize global
+	push dword _g ; push name
+	push 0x0 ; nullptr
+
+	call create_scope ; create global
+	add esp, 8 ; cleanup stack
+
+	mov dword [global_scope], eax ; store scope
+	ret ; return
+
+.return:
+	mov eax, dword [global_scope] ; return scope
+	ret
+
+section .data
+
+_g: db "global",0
+global_scope: dd 0
