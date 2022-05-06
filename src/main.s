@@ -1,116 +1,75 @@
 section .text
-global main
-extern get_global, fopen, printf
 
-main:
-	; clear up registers:
+extern fopen, lexer
+global main
+
+main: ; int main(int,char**)
+	dec dword [esp+4] ; decrement arg
+	add dword [esp+8], 4 ; increment past path
+
+	cmp dword [esp+4], 0 ; if no args, end
+	je .return
+
+	; free up registers
 	xor eax, eax
 	mov ebx, eax
 	mov ecx, eax
 	mov edx, eax
 
-	; skip path
-	dec dword [esp+4] ; int argc
-	add dword [esp+8],4 ; char **argv
+.args: ; now parse arguments
+	mov eax, [esp+8] ; get char**
+	mov ecx, [esp+4] ; get int
 
-	cmp dword [esp+4], 0
-	je .return ; return if no args
+	jecxz .end ; if arg count = 0, break
 
-.args: ; parse
-	; restore values
-	mov eax, [esp+8] ; char**
-	mov ecx, [esp+4] ; int
+	mov ebx, [eax] ; get char*
+	cmp byte [ebx], '-' ; switch value
 
-	jecxz .return ; kill if args = 0
-	mov ebx, [eax] ; offload char* to ebx
+	je .switch ; parse switch
 
-	cmp byte [ebx], '-' ; this means it is a switch
-	je .switch
+	; this is an input file
+	cmp dword [_file], 0
+	jne .return ; end if more than one input file
 
-	;; this means it is an input file
-	;; handle it as such
+	; now get FILE* object and store it
 
-	pusha ; store regs
+	push _io.r ; push file permissions
+	push ebx ; push file path
 
-	; push args
-	push io_perm.rp
-	push ebx
+	call fopen ; open file
 
-	call fopen ; get FILE*
-	mov dword [file], eax ; store FILE*
+	mov dword [_file], eax ; store FILE*
+	add esp, 8
 
-	add esp, 8 ; cleanup stack
-	jmp .iterate
+	cmp eax, 0
+	je .return ; error opening input file
 
-.iterate:
-	add dword [esp+8], 4 ; iterate to next char*
+	jmp .continue
 
-	cmp dword [esp+4], 0
-	je .return
+.end: ; end argument loop
+	push dword [_file] ; pass FILE*
+	
+	call lexer ; start compilation
+	add esp, 4 ; cleanup stack
 
-	dec dword [esp+4] ; int -= 1
+	xor eax, eax
+	ret
+.continue:
+	add dword [esp+8], 4
+	dec dword [esp+4]
 
 	jmp .args ; continue
-.return:
-	cmp byte [printnl], 0 ; if printnl != 0, print
-	je .skipnl
-
-	; now print newline
-	push 0x0a ; newline char
-	push print_strings.chr ; single char
-
-	call printf ; print
-	add esp, 8 ; cleanup stack
-.skipnl:
-	xor eax, eax ; return 0
-	ret
 
 .switch:
-	; grab input value
-	mov eax, [esp+8] ; current char*
-	add eax, 4 ; next char*
+	
 
-	cmp byte [ebx+1], 'o'
-	je .out
-
-	jmp .iterate
-
-;; SWITCH FUNCTIONS
-
-.out:
-	; eax = output file
-
-	push io_perm.w ; pass write perms
-	push eax ; pass file
-
-	call fopen ; create & open file
-	add esp, 8 ; clean up stack
-
-	cmp eax, 0 ; nullptr = error
-	je .return ; todo: implement error
-
-	mov dword [file.out], eax ; store FILE*
-
-	; iterate twice
-	dec dword [esp+4] ; dec arg count
-	add dword [esp+8], 4 ; increment to file
-
-	jmp .iterate ; continue
+.return:
+	ret
 
 section .data
 
-io_perm:
+_file: dd 0
 
-.r: db "r",0
-.w: db "w",0
-
-.rp: db "r+",0
-.wp: db "w+",0
-
-printnl: db 0 ; if set, print newline at the end
-
-print_strings:
-.chr: db "%c",0
-
-file: dd 0
-.out: dd 0
+_io:
+	.r db "r+",0
+	.w db "w+",0
