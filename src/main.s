@@ -63,7 +63,7 @@ main:
 	add esp, 4
 
 	push eax ; pass length
-	push dword [_ln] ; pass FILE*
+	push dword [_ln] ; pass char*
 
 	call lexer ; process line
 	add esp, 8
@@ -98,13 +98,10 @@ main:
 
 section .data
 _last: db 0
-
 _ln: dd 0
 _in: dd 0
-
 _io:
 	.w db "w+",0
 	.r db "r+",0
-
 _err:
 	.fnf: db "source input file not found!",0

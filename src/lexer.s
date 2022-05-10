@@ -29,10 +29,12 @@ get_line: ; get_line(FILE*, char *out)
 	ret
 
 lexer: ; int lexer(char *line, int ln_len)
+	cmp dword [esp+8], 0 ; check for empty line
+	je .ret
 
+	cmp dword [esp+4], 0 
+	je .ret ; end if null buffer
 .ret:
-	; find end char and return it
-
 	ret
 
 ; execute a single line of bs code
@@ -54,3 +56,5 @@ _ln: dd 0
 
 _tln: dd 0
 _cln: dd 0
+
+_ind: dd 0 ; indentation, 1 tab is 4 indents
