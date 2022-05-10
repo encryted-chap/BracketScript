@@ -1,5 +1,7 @@
 section .text
 
+%include "lib/debug.s"
+
 extern bs_exec, get_line, fopen, fclose, fgetc, feof
 extern strlen, malloc, free, lexer
 
@@ -26,10 +28,13 @@ main:
 	call fopen ; open file
 	add esp, 8 ; stack cleanup
 
+	push dword __LINE__ ; for error handler
+
 	mov dword [_in], eax ; store FILE*
 	cmp eax, 0 ; if nullptr, error
 
-	; je .error
+	je .file_nf
+	add esp, 4 ; clear line num
 
 .loop:
 	; allocate line buffer
@@ -84,6 +89,13 @@ main:
 	add esp, 4 ; cleanup
 	ret ; return
 
+
+.file_nf:
+	pop eax ; grab line number
+	error _err.fnf, eax ; call error
+
+	ret
+
 section .data
 _last: db 0
 
@@ -93,3 +105,6 @@ _in: dd 0
 _io:
 	.w db "w+",0
 	.r db "r+",0
+
+_err:
+	.fnf: db "source input file not found!",0
