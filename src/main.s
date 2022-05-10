@@ -2,6 +2,7 @@ section .text
 
 extern bs_exec, get_line, fopen, fclose, fgetc, feof
 extern strlen, malloc, free, lexer
+
 global main
 
 main:
@@ -49,9 +50,11 @@ main:
 	call get_line ; grab a single line
 	add esp, 8 ; clean
 
+	mov byte [_last], 1 ; set "last"
+.nlast:
 	push dword [_in] ; pass line
-	call strlen ; get length
 
+	call strlen ; get length
 	add esp, 4
 
 	push eax ; pass length
@@ -60,18 +63,19 @@ main:
 	call lexer ; process line
 	add esp, 8
 
-	push eax ; store result
-
 	; free line buffer
-	push dword [_in]
+	push dword [_ln]
 	call free
 
-	add esp, 4
+	add esp, 4 ; stack clean
 
-	pop eax ; restore
+	push dword [_in] ; pass FILE*
 
-	cmp eax, -1
-;	jne .loop
+	call feof ; check for end of file
+	add esp, 4 ; clean stack
+
+	cmp eax, 0
+	je .loop
 .end:
 	; close input file
 	push dword [_in] ; pass FILE*
@@ -81,8 +85,11 @@ main:
 	ret ; return
 
 section .data
+_last: db 0
+
 _ln: dd 0
 _in: dd 0
+
 _io:
 	.w db "w+",0
 	.r db "r+",0
