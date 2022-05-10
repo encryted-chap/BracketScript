@@ -1,1 +1,8 @@
-lmao
+# some basic commands to test the compiler
+
+def nop():
+	pass
+
+int main():
+	nop()
+	return 0

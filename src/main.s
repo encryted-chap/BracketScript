@@ -1,14 +1,12 @@
 section .text
 
-extern fopen, lexer
+extern bs_exec, get_line, fopen, fclose, fgetc, feof
+extern strlen, malloc, free
 global main
 
-main: ; int main(int,char**)
-	dec dword [esp+4] ; decrement arg
-	add dword [esp+8], 4 ; increment past path
-
-	cmp dword [esp+4], 0 ; if no args, end
-	je .return
+main:
+	cmp dword [esp+4], 2 ; check for arg count
+	jne .end
 
 	; free up registers
 	xor eax, eax
@@ -16,60 +14,57 @@ main: ; int main(int,char**)
 	mov ecx, eax
 	mov edx, eax
 
-.args: ; now parse arguments
-	mov eax, [esp+8] ; get char**
-	mov ecx, [esp+4] ; get int
+	add dword [esp+8], 4 ; next char*
+	dec dword [esp+4] ; dec int
 
-	jecxz .end ; if arg count = 0, break
+	mov eax, dword [esp+8] ; grab char**
 
-	mov ebx, [eax] ; get char*
-	cmp byte [ebx], '-' ; switch value
-
-	je .switch ; parse switch
-
-	; this is an input file
-	cmp dword [_file], 0
-	jne .return ; end if more than one input file
-
-	; now get FILE* object and store it
-
-	push _io.r ; push file permissions
-	push ebx ; push file path
+	push _io.r ; pass priveledges
+	push dword [eax] ; pass char*
 
 	call fopen ; open file
+	add esp, 8 ; stack cleanup
 
-	mov dword [_file], eax ; store FILE*
-	add esp, 8
+	mov dword [_in], eax ; store FILE*
+	cmp eax, 0 ; if nullptr, error
 
+	; je .error
+
+.loop:
+	; allocate line buffer
+	push 512 ; line size max
+
+	call malloc ; allocate memory
+	add esp, 4
+
+	; eax = void *line_buffer
 	cmp eax, 0
-	je .return ; error opening input file
+	je .loop ; try to allocate again
 
-	jmp .continue
+	mov dword [_ln], eax ; store void*
 
-.end: ; end argument loop
-	push dword [_file] ; pass FILE*
-	
-	call lexer ; start compilation
-	add esp, 4 ; cleanup stack
+	push eax ; pass void*
+	push dword [_in] ; pass FILE*
 
-	xor eax, eax
-	ret
-.continue:
-	add dword [esp+8], 4
-	dec dword [esp+4]
+	call get_line ; grab a single line
+	add esp, 8 ; clean
 
-	jmp .args ; continue
+	push dword [_in] ; pass line
+	call strlen ; get length
 
-.switch:
-	
+	add esp, 4
 
-.return:
+	; free line buffer
+	push dword [_in]
+	call free
+
+	add esp, 4
+.end:
 	ret
 
 section .data
-
-_file: dd 0
-
+_ln: dd 0
+_in: dd 0
 _io:
-	.r db "r+",0
 	.w db "w+",0
+	.r db "r+",0

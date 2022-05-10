@@ -1,78 +1,48 @@
 section .text
 
-global lexer
-extern fgetc, malloc
+%define L_MAX 255
+%define T_MAX 255
 
-lexer: ; void lexer(FILE*)
-	; clear up registers
-	xor ebx, ebx
-	mov ecx, ebx
-	mov edx, ebx
+global bs_exec, get_line
+extern strlen, fgetc, malloc
 
-.loop:
-	call get_line ; get single line
-	cmp dword [_fend], 0
+get_line: ; get_line(FILE*, char *out)
+	push dword [esp+4] ; pass FILE*
 
-	jne .end
+	call fgetc ; grab char
+	add esp, 4 ; store
 
-	push eax ; pass char*
-	call pass_line
+	mov ebx, dword [esp+8] ; grab char*
+	mov byte [ebx], al ; store al
 
-	add esp, 4 ; restore stack
-	jmp .loop ; iterate
-.end:
+	inc dword [esp+8] ; next char
+
+	; check for terminating char
+	cmp eax, -1
+	je .ret ; return if EOF
+
+	cmp eax, 0x0a
+	je .ret ; return if \n
+
+	jmp get_line
+.ret:
 	ret
+; execute a single line of bs code
+bs_exec: ; void bs_exec(char*)
+	push dword [esp+4] ; pass char*
+	call strlen
+	add esp, 4
 
-; processes a single line of information
-pass_line: ; void pass_line(char*)
+	push eax ; size
+	push dword [esp+4] ; FILE*
 
-	ret
+	;call lexer
+	add esp, 4 ; clean up
 
-; grab a single line from FILE*
-get_line: ; char *get_line(FILE*)
-	; allocate 255 byte buffer
-	push 255
-	call malloc ; allocate 255B
-
-	add esp, 4 ; clean up stack
-	cmp eax, 0
-
-	je .end ; end if nullptr
-
-	mov dword [_tb], eax ; offload void* to ebx
-	mov eax, [esp+4] ; grab FILE*
-
-	mov dword [_tf], eax ; store FILE*
-
-	; clear regs
-	xor ecx, ecx
-	mov edx, eax
-
-	push dword [_tb] ; ret value
-.loop:
-	push dword [_tf] ; pass FILE*
-	call fgetc ; get char
-	
-	add esp, 4 ; cleanup
-
-	cmp al, 0x0a
-	je .end
-
-	mov dword [_fend], 1
-	cmp al, -1
-	je .end
-
-	mov dword [_fend], 0
-
-	mov ebx, dword [_tb] ; grab void*
-	mov byte [ebx], al ; store byte
-
-	inc dword [_tb] ; inc buffer
-	jmp .loop
-.end:
-	pop eax ; pop char*
 	ret
 section .data
-_tf: dd 0
-_tb: dd 0
-_fend: dd 0
+
+_ln: dd 0
+
+_tln: dd 0
+_cln: dd 0
