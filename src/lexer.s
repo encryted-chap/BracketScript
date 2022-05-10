@@ -3,7 +3,7 @@ section .text
 %define L_MAX 255
 %define T_MAX 255
 
-global bs_exec, get_line
+global bs_exec, get_line, lexer
 extern strlen, fgetc, malloc
 
 get_line: ; get_line(FILE*, char *out)
@@ -27,6 +27,14 @@ get_line: ; get_line(FILE*, char *out)
 	jmp get_line
 .ret:
 	ret
+
+lexer: ; int lexer(char *line, int ln_len)
+
+.ret:
+	; find end char and return it
+
+	ret
+
 ; execute a single line of bs code
 bs_exec: ; void bs_exec(char*)
 	push dword [esp+4] ; pass char*
