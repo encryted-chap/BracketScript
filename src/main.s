@@ -50,7 +50,7 @@ main:
 	add esp, 12 ; stack cleanup
 
 	cmp eax, 0x0 ; nullptr
-	je .allc_fl ; memory alloc error
+	je .end
 
 	mov dword [_ln], eax ; store char*
 	push eax ; pass char*
