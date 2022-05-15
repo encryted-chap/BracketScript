@@ -39,51 +39,10 @@ lexer: ; int lexer(char *line, int ln_len)
 	cmp dword [esp+4], 0 
 	je .ret ; end if null buffer
 
-	mov eax, dword [esp+4] ; grab buffer
+	push dword [esp+4] ; pass buffer
+	call printf
 
-	; try to get indent mode
-	cmp byte [_imd], 0
-	jne .no_mode ; call mode
-
-	mov eax, dword [esp+4] ; get char*
-	cmp byte [eax], 0x9 ; tabs?
-
-	jne .sptst
-
-	mov byte [_imd], 1
-	jmp .mode
-
-.sptst:
-	cmp byte [eax], ' '
-	jne .no_mode
-
-	mov byte [_imd], 2
-	jmp .mode
-.mode:
-	; resolve whitespace and
-	; remove it
-	xor ebx, ebx ; clear ebx
-	mov ecx, ebx ; clear up ecx too
-
-	mov bl, byte ' ' ; spare space seperator
-	cmp byte [_imd], 2 ; spaces?
-
-	je .ws_remove
-	mov bl, byte 0x9 ; tab seperator
-
-.ws_remove: ; remove whitespace
-	cmp byte [eax], bl
-	jne .end_wsrm
-
-	inc dword [_ind] ; add one for indentation
-
-	inc eax ; next char*
-	dec dword [esp+8] ; decrement len
-
-	jmp .ws_remove ; iterate
-.end_wsrm:
-	mov dword [esp+4], eax ; store new char*
-.no_mode:
+	add esp, 4
 .ret:
 	ret
 
