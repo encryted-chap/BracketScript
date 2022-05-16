@@ -29,7 +29,7 @@ new_token: ; token_t *new_token()
 	mov dword [ebx+eax], ecx ; set line num
 
 	token_getv token_t.init
-	mov dword [ebx+eax], 1  ; set init flag
+	mov byte [ebx+eax], 1  ; set init flag
 
 	mov eax, ebx ; return token_t*
 	ret ; return

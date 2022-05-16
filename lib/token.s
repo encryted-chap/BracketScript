@@ -15,3 +15,5 @@ endstruc
 	mov eax, token_t ; grab token
 	sub eax, dword %1 ; calculate offset
 %endmacro
+
+
