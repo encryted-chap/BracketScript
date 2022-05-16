@@ -7,7 +7,7 @@ section .text
 %define T_MAX 255
 
 global lexer
-extern printf
+extern printf, new_token
 extern feof
 extern newline, strtok
 
@@ -43,13 +43,14 @@ lexer: ; int lexer(char *line, int ln_len, FILE *_in)
 	add esp, 8 ; clean
 
 	mov dword [str], 0 ; nullify string
-	push eax ; pass token
-
-	; call token_handler
-	add esp, 4
 
 	cmp eax, 0 ; nullptr
 	je .ret ; exit
+
+	push eax ; store char*
+
+	call token_handler ; create token_t*
+	add esp, 4 ; clean up
 
 	jmp .loop
 .ret:
@@ -58,6 +59,9 @@ lexer: ; int lexer(char *line, int ln_len, FILE *_in)
 	mov eax, -1
 	jmp .ret ; return
 
+token_handler: ; token_t *token_handler(char *token)
+	call new_token ; get fresh token_t*
+	ret
 section .data
 
 str: dd 0

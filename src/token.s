@@ -2,6 +2,13 @@
 
 section .data
 
+token_def:
+	.type db 0 ; type
+	.raws dd 0 ; raws
+	.line dd 0 ; line
+	.init db 1 ; init
+	.size:
+
 c_line: dd 0
 
 section .text
@@ -15,21 +22,17 @@ newline:
 
 ; makes the default token
 new_token: ; token_t *new_token()
-	token_getv token_t.size ; get size (eax)
-	push eax ; pass size
+	mov eax, dword [c_line] ; get line
+	mov dword [token_def.line], eax ; store line num
 
-	call malloc ; allocate new token
+	push token_def.size - token_def ; get size
+
+	call malloc ; allocate buffer
 	add esp, 4 ; clean
 
-	; eax holds token_t*
-	mov ebx, eax ; offload
-	token_getv token_t.line ; get line offset
+	mov ecx, token_def.size - token_def
+	mov edi, eax ; void*
+	mov esi, token_def
 
-	mov ecx, dword [c_line] ; get line
-	mov dword [ebx+eax], ecx ; set line num
-
-	token_getv token_t.init
-	mov byte [ebx+eax], 1  ; set init flag
-
-	mov eax, ebx ; return token_t*
+	rep movsb ; copy to new buffer
 	ret ; return
