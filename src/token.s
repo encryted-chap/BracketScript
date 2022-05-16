@@ -21,9 +21,12 @@ newline:
 	ret
 
 ; makes the default token
-new_token: ; token_t *new_token()
+new_token: ; token_t *new_token(char*)
 	mov eax, dword [c_line] ; get line
 	mov dword [token_def.line], eax ; store line num
+
+	mov eax, dword [esp+4] ; grab char*
+	mov dword [token_def.raws], eax ; store raw data
 
 	push token_def.size - token_def ; get size
 

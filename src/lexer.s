@@ -60,7 +60,11 @@ lexer: ; int lexer(char *line, int ln_len, FILE *_in)
 	jmp .ret ; return
 
 token_handler: ; token_t *token_handler(char *token)
+	push dword [esp+4] ; pass token
+
 	call new_token ; get fresh token_t*
+	add esp, 4
+
 	ret
 section .data
 
