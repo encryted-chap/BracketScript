@@ -41,5 +41,30 @@ namespace bs {
 			while(stacks[track].Count < addrs + size)
 				stacks[track].Add(0x0); // pad null bytes
 		}
+
+		// writes a block of data to the memory 
+		// block, with an optional offset
+		public void Write(byte[] data, int offset=0) {
+			int len = data.Length + offset; // calculate total len
+			
+			// if len over boundaries, prevent stack overflow
+			if(len > length) { 
+				// print error message then
+				// kill the program
+				Console.WriteLine(
+					"FATAL: a stack overflow violation occurred:\n" + 
+					$"DEBUG: trk={track},off=0x{offset.ToString("X")},adr=0x{addrs.ToString("X")}"
+				);
+				Environment.Exit(0); // exit program
+			}
+
+			stacks[track].InsertRange(addrs+offset, data); // write to track
+		}
+
+		// reads the block of data from 
+		// the memory block, as a byte[]
+		public byte[] Read() {
+			return stacks[track].GetRange(addrs, length).ToArray();
+		}
 	}
 }

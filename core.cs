@@ -22,5 +22,11 @@ namespace bs {
 				Console.WriteLine($"FATAL: called {fullname}, but it wasn\'t a function");
 			}
 		}
+		
+		public static program_t Parse(string ifile, string ofile) {
+			scope _pscope = new scope("global"); // create scope for new file
+			string[] lines = File.ReadAllLines(ifile); // get lines
+			
+		}
 	}
 }
