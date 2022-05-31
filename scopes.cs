@@ -13,6 +13,7 @@ namespace bs {
 			CLASS, NAMESPACE,
 			SCOPE,
 		} 
+
 		public scopetype _type = scopetype.SCOPE; // the type of scope of this object
 		public static scope global_scope;
 
@@ -46,10 +47,26 @@ namespace bs {
 				}
 			}
 		}
+		// only to be used for the global scope,
+		// not for anything else.
+		public scope(string asm_name) { 
+			_asm = asm_name;
+		}
 
 		// get assembly label name
-		public string get_as() => _asm;	
+		public string get_as() => _asm;
+
+		// inherit all properties of scope
+		// object s.
+		public void Merge(scope s) {
+			// inherit children from s
+			children.AddRange(
+					s.children.ToArray()
+			);
+		}
+	}
+
+	class bsclass : scope {
+		public extern bsclass(string name, scope parent);
 	}
 }
-
-
