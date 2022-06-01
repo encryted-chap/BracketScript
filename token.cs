@@ -1,5 +1,4 @@
 using bs;
-using System.IO;
 using System.Collections.Generic;
 
 namespace bs {
@@ -41,7 +40,8 @@ namespace bs {
 						"static", "if", "while",
 						"for", "do", "import",
 						"switch", "case", "extern",
-						"def", "return", "pass"
+						"def", "return", "pass", 
+						"class", "namespace",
 					}
 				},
 			};
