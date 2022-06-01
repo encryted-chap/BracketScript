@@ -1,0 +1,8 @@
+extern def printf(char*, any) 
+
+# the entry point of the
+# very first bracketscript
+# program
+int main():
+	printf("hello, world!")
+	return 0

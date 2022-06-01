@@ -1,4 +1,5 @@
 using bs;
+using System.Collections.Generic;
 
 /*
  * this file is dedicated to abstracting the
@@ -26,7 +27,16 @@ namespace bs {
 		public static program_t Parse(string ifile, string ofile) {
 			scope _pscope = new scope("global"); // create scope for new file
 			string[] lines = File.ReadAllLines(ifile); // get lines
-			
+		
+			List<token_t[]> t_lines = new List<token_t[]>(); // token lines
+
+			foreach(var ln in lines) {
+				t_lines.Add( // add to lines
+					token_t.GetTokens(ln) // get tokens from line
+				);
+			}
+
+			return new program_t();
 		}
 	}
 }

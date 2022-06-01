@@ -23,7 +23,7 @@ namespace bs {
 			if(ofile == string.Empty)
 				ofile = ifile + ".s";
 
-			
+			core.Parse(ifile, ofile);			
 		}
 	}	
 }
