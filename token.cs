@@ -29,7 +29,7 @@ namespace bs {
 						"=","+","-","*","/",
 						"^","&",">","<","!",
 						"%","(",")",":",";",
-						",","and","not", 
+						",","and","not","@", 
 						"or","\"", "\'", 
 					}
 				},
@@ -68,11 +68,7 @@ namespace bs {
 				int begin = line.IndexOf('\"'); // get start index
 				int end = line.IndexOf('\"', begin+1)+1; // get end index
 				
-				// get chars (substring wouldnt work)
-				string lit = string.Empty;
-				for(int i = begin; i < end; i++) {
-					lit += line[i]; // get char
-				}
+				string lit = line.Substring(begin, end - begin); // get string
 				strlit.Add(lit); // add string literal
 
 				line = line.Remove(begin, end - begin); // remove all but one
@@ -80,6 +76,7 @@ namespace bs {
 			}
 
 			line = line.Replace('\n','\"');
+
 			// get all plaintext tokens
 			foreach(var t in match[token_type.OPERATOR]) {
 				line = line.Replace(t, $" {t} "); // space so that its counted as token
@@ -138,8 +135,21 @@ namespace bs {
 				});
 				Console.WriteLine($"===> token: {ret[ret.Count-1]._t},\"{ret[ret.Count-1].txt}\""); 
 			}
-			Console.WriteLine($"line {Line} parsed: {ret.Count} tokens");	
+			Console.WriteLine($"line {Line} parsed: {ret.Count} tokens\n");	
+
 			return ret.ToArray();
+		}
+
+		// processes a file's tokens, this is used to process
+		// import files, and such.
+		public static scope Process(List<token_t[]> file) {
+			
+			// iterate through every line of tokens
+			for(int i = 0; i < file.Count; i++) {
+				token_t[] ln = file[i]; // for readability
+				
+			}
+			return null; // dummy return value
 		}
 	};
 }

@@ -31,9 +31,12 @@ namespace bs {
 			List<token_t[]> t_lines = new List<token_t[]>(); // token lines
 
 			foreach(var ln in lines) {
-				t_lines.Add( // add to lines
-					token_t.GetTokens(ln) // get tokens from line
-				);
+				var t = token_t.GetTokens(ln); // get tokens
+				
+				if(!object.ReferenceEquals(null, t)) {
+					// not null
+					t_lines.Add(t);
+				} else continue;
 			}
 
 			return new program_t();
