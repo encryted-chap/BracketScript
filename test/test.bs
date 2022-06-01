@@ -3,6 +3,6 @@ extern def printf(char*, any)
 # the entry point of the
 # very first bracketscript
 # program
-int main():
+def main():
 	printf("hello, world!")
 	return 0

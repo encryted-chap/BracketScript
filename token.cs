@@ -30,7 +30,8 @@ namespace bs {
 						"=","+","-","*","/",
 						"^","&",">","<","!",
 						"%","(",")",":",";",
-						"and", "or", "not",
+						",","and","not", 
+						"or","\"", "\'", 
 					}
 				},
 				{
@@ -40,7 +41,7 @@ namespace bs {
 						"static", "if", "while",
 						"for", "do", "import",
 						"switch", "case", "extern",
-						"def"
+						"def", "return", "pass"
 					}
 				},
 			};
@@ -59,13 +60,32 @@ namespace bs {
 
 			string tst = "\t";
 			for(; line.StartsWith(tst); ++ind, tst += "\t"); // get indent using "FOR MAGIC!"
+			line = line.Trim(); // trim off tabs (and trailing whitespace)
 
+			List<string> strlit = new List<string>(); // list of string literals
+			while(line.Contains('\"')) {
+				// get string literals
+				int begin = line.IndexOf('\"'); // get start index
+				int end = line.IndexOf('\"', begin+1)+1; // get end index
+				
+				// get chars (substring wouldnt work)
+				string lit = string.Empty;
+				for(int i = begin; i < end; i++) {
+					lit += line[i]; // get char
+				}
+				strlit.Add(lit); // add string literal
+
+				line = line.Remove(begin, end - begin); // remove all but one
+				line = line.Insert(begin, "\n"); // replace with newline
+			}
+
+			line = line.Replace('\n','\"');
 			// get all plaintext tokens
 			foreach(var t in match[token_type.OPERATOR]) {
 				line = line.Replace(t, $" {t} "); // space so that its counted as token
 			}
-			line = line.Trim(); // trim trailing and leading chars
 			line = line.Replace("  ", " "); // remove double spacing
+			line = line.Trim(); // trim once more
 
 			string[] spl = line.Split(' '); // split string
 			
@@ -87,6 +107,13 @@ namespace bs {
 			for(int i = 0; i < spl.Length; i++) {
 				int _ln = token_t.Line;
 				token_type ty = token_type.IDENTIFIER; // default to identifier
+
+				if(spl[i] == "\"") {
+					// string literal
+					spl[i] = strlit[0]; // get string literal 0
+					strlit.RemoveAt(0); // pop 0 off
+					ty = token_type.LITERAL; // assign literal type
+				}
 
 				// check for token type:
 				if(opm.Contains(spl[i])) {
