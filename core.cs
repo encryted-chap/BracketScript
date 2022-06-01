@@ -24,9 +24,9 @@ namespace bs {
 			}
 		}
 		
-		public static program_t Parse(string ifile, string ofile) {
+		public static program_t Parse(string _ifile, string? _ofile=null) {
 			scope _pscope = new scope("global"); // create scope for new file
-			string[] lines = File.ReadAllLines(ifile); // get lines
+			string[] lines = File.ReadAllLines(_ifile); // get lines
 		
 			List<token_t[]> t_lines = new List<token_t[]>(); // token lines
 
@@ -38,8 +38,9 @@ namespace bs {
 					t_lines.Add(t);
 				} else continue;
 			}
-
-			return new program_t();
+			
+			_pscope = token_t.Process(t_lines, _pscope); // process file
+			return new program_t(_pscope, _ifile, _ofile);
 		}
 	}
 }

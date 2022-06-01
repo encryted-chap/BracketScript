@@ -42,6 +42,13 @@ namespace bs {
 				stacks[track].Add(0x0); // pad null bytes
 		}
 
+		// clears all tracks of virtual memory
+		public static void Clear() {
+			for(int i = 0; i < stacks.Length; i++) {
+				stacks[i] = new List<byte>();
+			}
+		}
+
 		// writes a block of data to the memory 
 		// block, with an optional offset
 		public void Write(byte[] data, int offset=0) {

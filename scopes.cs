@@ -96,16 +96,17 @@ namespace bs {
 		}
 
 		// returns a scope, but only if it's of type "stype",
-		// returns global on error/failure to find scope.
-		// uses the scope.Find(string). 
-		public static scope FindType(string fullname, scope.scopetype stype) {
+		// kills program on error
+		public static scope Find(string fullname, scope.scopetype stype) {
 			scope s = scope.Find(fullname); // get scope of any type
 
 			// only return if it is of type "stype"
 			if(s._type == stype) return s; 
 			else {
-				return global_scope; // global scope on err
+				Console.WriteLine($"FATAL: Attempt to get type {stype} was not {stype}");
+				Environment.Exit(0);
 			}
+			return null;
 		}
 	}
 

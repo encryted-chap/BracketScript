@@ -142,14 +142,65 @@ namespace bs {
 
 		// processes a file's tokens, this is used to process
 		// import files, and such.
-		public static scope Process(List<token_t[]> file) {
+		public static scope Process(List<token_t[]> file, scope g) {
+			scope.global_scope = g;
+
+			vmem.Clear(); // clear all virtual memory for processing
 			
 			// iterate through every line of tokens
 			for(int i = 0; i < file.Count; i++) {
 				token_t[] ln = file[i]; // for readability
+		
+				if(Test(ln, "ii")) {
+					// variable definition
+					string namec = ln[0].txt; // class of the new var
+					string namev = ln[1].txt; // name of this class
+
+					scope sc = scope.Find(namec+"_local", scope.scopetype.CLASS); // find class scope
+					scope vc = new scope(namev, g); // create new variable scope
+
+					vc.Merge(sc); // inherit properties and methods from sc
+					vc._type = scope.scopetype.VARIABLE; // set correct scope type
+
+					g.children.Add(vc); // register in global scope
+					continue; // next token
 				
+				} else if(Test(ln, "ioi")) {
+					// var = var
+
+				}
 			}
-			return null; // dummy return value
+			return g; // return the global scope, now updated
+		}
+		// matches for Test()
+		private static Dictionary<char,token_type> tmatch = 
+			new Dictionary<char,token_type>() {
+				{ 'o', token_type.OPERATOR },
+				{ 'i', token_type.IDENTIFIER },
+				{ 'k', token_type.KEYWORD },
+				{ 'L', token_type.LITERAL },
+			};
+
+		// * = any token type
+		// ! = end search
+		// o = operator
+		// i = identifier
+		// k = keyword
+		// L = literal
+		// ^ This is a custom match format for testing lines
+		// of tokens, it tests for token types easily and in
+		// a readable way, instead of a 2-line if statement
+		private static bool Test(token_t[] t, string format) {
+			// this would mean they are inequal
+			if(t.Length != format.Length) 
+				return false; 
+			// check for a match between format and t
+			for(int i = 0; i < format.Length; i++) {
+				if(format[i] == '*') continue; // no need to check with this
+				else if(format[i] == '!') break; // end search here
+				else if(t[i]._t != tmatch[format[i]]) return false; // inequal, end
+			}
+			return true;
 		}
 	};
 }
