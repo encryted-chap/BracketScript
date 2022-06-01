@@ -113,13 +113,17 @@ namespace bs {
 					spl[i] = strlit[0]; // get string literal 0
 					strlit.RemoveAt(0); // pop 0 off
 					ty = token_type.LITERAL; // assign literal type
-				}
-
-				// check for token type:
-				if(opm.Contains(spl[i])) {
+				} else if(opm.Contains(spl[i])) {
 					ty = token_type.OPERATOR; // is an operator
 				} else if(kym.Contains(spl[i])) {
-					ty = token_type.KEYWORD;
+					ty = token_type.KEYWORD; // is a keyword
+				} else {
+					// is an identifier
+					// try to check for literals
+					try {
+						System.Convert.ToInt32(spl[i]);
+						ty = token_type.LITERAL;
+					} catch { }
 				}
 
 				// add this token

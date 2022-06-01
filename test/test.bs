@@ -4,5 +4,7 @@ extern def printf(char*, any)
 # very first bracketscript
 # program
 def main():
+	int x = 10
+
 	printf("hello, world!")
 	return 0
