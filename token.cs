@@ -105,6 +105,9 @@ namespace bs {
 			// now iterate through each word to generate a token_t,
 			// return the output of each word as a list to end function.
 			for(int i = 0; i < spl.Length; i++) {
+				if(string.IsNullOrEmpty(spl[i])) continue; // reiterate on null token
+				if(spl[i] == "#") break; // end on comment
+
 				int _ln = token_t.Line;
 				token_type ty = token_type.IDENTIFIER; // default to identifier
 
