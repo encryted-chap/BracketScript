@@ -117,6 +117,7 @@ namespace bs {
 		private readonly scope _local; 
 		public readonly scope _static;
 		
+		
 		// creates an instance of this classes local scope,
 		// essentially creating a new variable.
 		public scope CreateInstance(string name, scope parent) {
@@ -127,4 +128,30 @@ namespace bs {
 			return i; // return variable scope
 		}
 	};
+	class bs_class : scope {
+		private readonly scope local;
+		public bool def_virt; // store instances in virtual memory by default?
+
+		// normal inherited constructors
+		extern public bs_class(string asm_name);	
+		extern public bs_class(string name, scope parent);
+
+		public bs_var CreateInstance(string name, scope parent) {
+			// creates a new instance of this class object,
+			// uses the local scope to create a predefined clone.
+			
+			bs_var ret = new bs_var(name, parent);
+			ret.isvirt = def_virt;
+
+			return null;
+		}
+	}
+	class bs_var : scope {
+		public bool isvirt; // stored in vmem?
+		private vmem? mem; // memory block
+
+		// normal inherited constructors
+		extern public bs_var(string asm_name);
+		extern public bs_var(string name, scope parent);
+	}
 }

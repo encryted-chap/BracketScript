@@ -1,7 +1,18 @@
 using System.Collections.Generic;
 
 namespace bs {
-	
+
+	// ambiguous memory block
+	// (both virtual and ram)
+	class mblock {
+		public readonly bool virt; // virtual memory
+
+		// copy to new mblock
+		public void Copy(mblock dst) {
+
+		}
+	}
+
 	// block of compiler-space
 	// memory.
 	class vmem {
