@@ -17,6 +17,7 @@ namespace bs {
 		private static int _line;
 
 		public int line; // line this token is on
+		public int indent; // indentation of this token
 
 		// plaintext matches for certain token types,
 		// allows the token class to parse tokens based on
@@ -38,7 +39,8 @@ namespace bs {
 						"export", "virtual", 
 						"static", "if", "while",
 						"for", "do", "import",
-						"switch", "case", 
+						"switch", "case", "extern",
+						"def"
 					}
 				},
 			};
@@ -46,16 +48,23 @@ namespace bs {
 		public string txt; // plaintext value of this token 
 
 		public static token_t[] GetTokens(string ln) {
+			int ind = 0; // indentation for this line
+
 			Line++;
 			if(string.IsNullOrWhiteSpace(ln)) return null; 
 
 			// preprocess line:
 			string line = ln;
+			line = line.Replace("    ", "\t"); // use tabs
+
+			string tst = "\t";
+			for(; line.StartsWith(tst); ++ind, tst += "\t"); // get indent using "FOR MAGIC!"
 
 			// get all plaintext tokens
 			foreach(var t in match[token_type.OPERATOR]) {
-				line = line.Replace(t, $" {t} "); // 
+				line = line.Replace(t, $" {t} "); // space so that its counted as token
 			}
+			line = line.Trim(); // trim trailing and leading chars
 			line = line.Replace("  ", " "); // remove double spacing
 
 			string[] spl = line.Split(' '); // split string
@@ -68,6 +77,10 @@ namespace bs {
 			kym.AddRange(match[token_type.KEYWORD]);
 
 			List<token_t> ret = new List<token_t>(); // the list of tokens to return
+
+			Console.WriteLine($"parsing line {Line} ... ");
+			Console.WriteLine($"===> indentation: {ind}");
+			int str_index = 0; // index of the current literal
 
 			// now iterate through each word to generate a token_t,
 			// return the output of each word as a list to end function.
@@ -87,7 +100,9 @@ namespace bs {
 					line = _ln,
 					_t = ty,
 					txt = spl[i],
+					indent = ind,
 				});
+				Console.WriteLine($"===> token: {ret[ret.Count-1]._t},\"{ret[ret.Count-1].txt}\""); 
 			}
 			Console.WriteLine($"line {Line} parsed: {ret.Count} tokens");	
 			return ret.ToArray();
