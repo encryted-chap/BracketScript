@@ -151,24 +151,6 @@ namespace bs {
 			for(int i = 0; i < file.Count; i++) {
 				token_t[] ln = file[i]; // for readability
 		
-				if(Test(ln, "ii")) {
-					// variable definition
-					string namec = ln[0].txt; // class of the new var
-					string namev = ln[1].txt; // name of this class
-
-					scope sc = scope.Find(namec+"_local", scope.scopetype.CLASS); // find class scope
-					scope vc = new scope(namev, g); // create new variable scope
-
-					vc.Merge(sc); // inherit properties and methods from sc
-					vc._type = scope.scopetype.VARIABLE; // set correct scope type
-
-					g.children.Add(vc); // register in global scope
-					continue; // next token
-				
-				} else if(Test(ln, "ioi")) {
-					// var = var
-
-				}
 			}
 			return g; // return the global scope, now updated
 		}
