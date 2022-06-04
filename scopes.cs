@@ -148,7 +148,7 @@ namespace bs {
 	}
 	class bs_var : scope {
 		public bool isvirt; // stored in vmem?
-		private vmem? mem; // memory block
+		private vblock mem; // memory block
 
 		// normal inherited constructors
 		extern public bs_var(string asm_name);

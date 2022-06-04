@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bs_rewrite", "bs_rewrite.csproj", "{7478A1C0-1784-4B87-A076-36A7EF02617D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -10,5 +12,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7478A1C0-1784-4B87-A076-36A7EF02617D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7478A1C0-1784-4B87-A076-36A7EF02617D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7478A1C0-1784-4B87-A076-36A7EF02617D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7478A1C0-1784-4B87-A076-36A7EF02617D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

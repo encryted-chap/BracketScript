@@ -140,19 +140,19 @@ namespace bs {
 			return ret.ToArray();
 		}
 
-		// processes a file's tokens, this is used to process
-		// import files, and such.
+		// processes and resolves the scope of a function, class,
+		// or namespace
 		public static scope Process(List<token_t[]> file, scope g) {
-			scope.global_scope = g;
-
-			vmem.Clear(); // clear all virtual memory for processing
-			
-			// iterate through every line of tokens
+			Console.WriteLine("Executing ... ");
+			string PATH = g._asm; // get full path to scope
 			for(int i = 0; i < file.Count; i++) {
-				token_t[] ln = file[i]; // for readability
-		
+				if(Test(file[i], "iio.") && file[i][2].txt == "=") {
+					// var def with assignment
+					Console.WriteLine($"===> Match \"iio.\", line {file[i][0].line}");
+				}
 			}
-			return g; // return the global scope, now updated
+
+			return null;	
 		}
 		// matches for Test()
 		private static Dictionary<char,token_type> tmatch = 
@@ -163,7 +163,8 @@ namespace bs {
 				{ 'L', token_type.LITERAL },
 			};
 
-		// * = any token type
+		// * = any tokens
+		// . = any single token
 		// ! = end search
 		// o = operator
 		// i = identifier
@@ -178,8 +179,21 @@ namespace bs {
 				return false; 
 			// check for a match between format and t
 			for(int i = 0; i < format.Length; i++) {
-				if(format[i] == '*') continue; // no need to check with this
-				else if(format[i] == '!') break; // end search here
+				if(format[i] == '.') continue; // no need to check with this
+				else if(format[i] == '*') {
+					int j = i; // store j (string index)
+					
+					// check if this is last char
+					if(i == format.Length - 1) {
+						return true; // its a match
+					}
+
+					while(i < t.Length && t[i]._t != tmatch[format[j+1]]) { 
+						i++; // increment until fulfilled
+						if(i == t.Length) return false; // not a match if end without match
+					} continue; // loop to next char
+
+				} else if(format[i] == '!') break; // end search here
 				else if(t[i]._t != tmatch[format[i]]) return false; // inequal, end
 			}
 			return true;

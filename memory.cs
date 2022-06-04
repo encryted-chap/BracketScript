@@ -40,14 +40,6 @@ namespace bs {
 		private static List<sblock> stack = new List<sblock>(); // map of the stack
 
 		public override void Alloc() {
-			// asm($"sub esp, {length}");
-			stack_index = 0;
-
-			for(int i = 0; i < stack.Count; i++) {
-				stack[i].stack_index += length; // shift to correct
-				
-			}
-			stack.Add(this); // register in stack
 		}
 
 		public override void Free() {
