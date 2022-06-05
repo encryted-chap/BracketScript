@@ -146,10 +146,9 @@ namespace bs {
 			Console.WriteLine("Executing ... ");
 			string PATH = g._asm; // get full path to scope
 			for(int i = 0; i < file.Count; i++) {
-				if(Test(file[i], "iio.") && file[i][2].txt == "=") {
-					// var def with assignment
-					Console.WriteLine($"===> Match \"iio.\", line {file[i][0].line}");
-				}
+				// use Test() function to find 
+				// match for token[]
+					
 			}
 
 			return null;	

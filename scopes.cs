@@ -48,6 +48,7 @@ namespace bs {
 					break; // end loop
 				}
 			}
+			Console.WriteLine($"===> scope created: {_asm}");
 		}
 		// only to be used for the global scope,
 		// not for anything else.
@@ -61,6 +62,8 @@ namespace bs {
 		// inherit all properties of scope
 		// object s.
 		public void Merge(scope s) {
+			Console.WriteLine($"===> merging {s._asm} {this._asm}");
+
 			// inherit children from s
 			children.AddRange(
 				s.children.ToArray() // ensure it is a scope[]
