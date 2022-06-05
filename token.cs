@@ -81,14 +81,6 @@ namespace bs {
 			line = line.Replace("  ", " ").Trim(); // remove double spacing
 
 			string[] spl = line.Split(' '); // split string
-			
-			// get match profiles
-			List<string> opm = new List<string>();
-			opm.AddRange(match[token_type.OPERATOR]);
-
-			List<string> kym = new List<string>();
-			kym.AddRange(match[token_type.KEYWORD]);
-
 			List<token_t> ret = new List<token_t>(); // the list of tokens to return
 
 			Console.WriteLine($"parsing line {Line} ... ");
@@ -103,23 +95,30 @@ namespace bs {
 				int _ln = token_t.Line;
 				token_type ty = token_type.IDENTIFIER; // default to identifier
 
+				
+
 				if(spl[i] == "\"") {
 					// string literal
 					spl[i] = strlit[0]; // get string literal 0
 					strlit.RemoveAt(0); // pop 0 off
+
 					ty = token_type.LITERAL; // assign literal type
-				} else if(opm.Contains(spl[i])) {
-					ty = token_type.OPERATOR; // is an operator
-				} else if(kym.Contains(spl[i])) {
-					ty = token_type.KEYWORD; // is a keyword
-				} else {
-					// is an identifier
-					// try to check for literals
-					try {
-						System.Convert.ToInt32(spl[i]);
-						ty = token_type.LITERAL;
-					} catch { }
+					continue; // keep going to next token
+				} 
+
+				for(int j = (int)token_type.IDENTIFIER; j <= (int)token_type.KEYWORD; j++) {
+					if(!match.ContainsKey((token_type)i)) 
+						continue; // no need to check if uncheckable
+
+					// test for match
+					if(Array.IndexOf(match[(token_type)i], spl[i]) > -1) {
+						// its a match
+						ty = (token_type)i;
+					}
 				}
+
+				if(object.ReferenceEquals(null, ty))
+					ty = token_type.IDENTIFIER; // the default
 
 				// add this token
 				ret.Add(new token_t() {
@@ -173,7 +172,8 @@ namespace bs {
 			// check for a match between format and t
 			for(int i = 0; i < format.Length; i++) {
 				switch(format[i]) {
-					case '.': continue; // no need to check with this
+					case '.': 
+						continue; // no need to check with this
 					
 					case '*': {
 						int j = i; // store j (string index)
@@ -192,8 +192,9 @@ namespace bs {
 					case '!': return true; // end search here
 
 					default: {
-						if(t[i]._t != tmatch[format[i]]) return false;
-						else continue; // keep going
+						// normal token:
+						if(t[i]._t != tmatch[format[i]]) 
+							return false; // not a match!
 					} break;
 				}
 
