@@ -12,8 +12,7 @@ namespace bs {
 		
 		// the current line number that
 		// the program is executing
-		public static int Line { get { return _line; } private set { _line = value; } }
-		private static int _line;
+		public static int Line { get; private set; }
 
 		public int line; // line this token is on
 		public int indent; // indentation of this token
@@ -49,10 +48,11 @@ namespace bs {
 		public string txt; // plaintext value of this token 
 
 		public static token_t[] GetTokens(string ln) {
-			int ind = 0; // indentation for this line
+			Line++; // increase line count
+			if(string.IsNullOrWhiteSpace(ln)) 
+				return null; // skip null line 
 
-			Line++;
-			if(string.IsNullOrWhiteSpace(ln)) return null; 
+			int ind = 0; // indentation for this line
 
 			// preprocess line:
 			string line = ln;
@@ -60,7 +60,6 @@ namespace bs {
 
 			string tst = "\t";
 			for(; line.StartsWith(tst); ++ind, tst += "\t"); // get indent using "FOR MAGIC!"
-			line = line.Trim(); // trim off tabs (and trailing whitespace)
 
 			List<string> strlit = new List<string>(); // list of string literals
 			while(line.Contains('\"')) {
@@ -71,18 +70,15 @@ namespace bs {
 				string lit = line.Substring(begin, end - begin); // get string
 				strlit.Add(lit); // add string literal
 
-				line = line.Remove(begin, end - begin); // remove all but one
-				line = line.Insert(begin, "\n"); // replace with newline
+				line = line.Remove(begin, end - begin).Insert(begin, "\n"); // remove all but one and replace
 			}
-
 			line = line.Replace('\n','\"');
 
 			// get all plaintext tokens
 			foreach(var t in match[token_type.OPERATOR]) {
 				line = line.Replace(t, $" {t} "); // space so that its counted as token
 			}
-			line = line.Replace("  ", " "); // remove double spacing
-			line = line.Trim(); // trim once more
+			line = line.Replace("  ", " ").Trim(); // remove double spacing
 
 			string[] spl = line.Split(' '); // split string
 			
@@ -97,7 +93,6 @@ namespace bs {
 
 			Console.WriteLine($"parsing line {Line} ... ");
 			Console.WriteLine($"===> indentation: {ind}");
-			int str_index = 0; // index of the current literal
 
 			// now iterate through each word to generate a token_t,
 			// return the output of each word as a list to end function.
@@ -133,6 +128,8 @@ namespace bs {
 					txt = spl[i],
 					indent = ind,
 				});
+
+				// debug information
 				Console.WriteLine($"===> token: {ret[ret.Count-1]._t},\"{ret[ret.Count-1].txt}\""); 
 			}
 			Console.WriteLine($"line {Line} parsed: {ret.Count} tokens\n");	
@@ -173,29 +170,35 @@ namespace bs {
 		// of tokens, it tests for token types easily and in
 		// a readable way, instead of a 2-line if statement
 		private static bool Test(token_t[] t, string format) {
-			// this would mean they are inequal
-			if(t.Length != format.Length) 
-				return false; 
 			// check for a match between format and t
 			for(int i = 0; i < format.Length; i++) {
-				if(format[i] == '.') continue; // no need to check with this
-				else if(format[i] == '*') {
-					int j = i; // store j (string index)
+				switch(format[i]) {
+					case '.': continue; // no need to check with this
 					
-					// check if this is last char
-					if(i == format.Length - 1) {
-						return true; // its a match
-					}
+					case '*': {
+						int j = i; // store j (string index)
+					
+						// check if this is last char
+						if(i == format.Length - 1) {
+							return true; // its a match
+						}
 
-					while(i < t.Length && t[i]._t != tmatch[format[j+1]]) { 
-						i++; // increment until fulfilled
-						if(i == t.Length) return false; // not a match if end without match
-					} continue; // loop to next char
+						while(i < t.Length && t[i]._t != tmatch[format[j+1]]) { 
+							i++; // increment until fulfilled
+							if(i == t.Length) return false; // not a match if end without match
+						} continue; // loop to next char
+					} break;
+					
+					case '!': return true; // end search here
 
-				} else if(format[i] == '!') break; // end search here
-				else if(t[i]._t != tmatch[format[i]]) return false; // inequal, end
+					default: {
+						if(t[i]._t != tmatch[format[i]]) return false;
+						else continue; // keep going
+					} break;
+				}
+
 			}
 			return true;
 		}
-	};
+	}
 }

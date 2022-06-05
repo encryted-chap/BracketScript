@@ -62,7 +62,7 @@ namespace bs {
 		// inherit all properties of scope
 		// object s.
 		public void Merge(scope s) {
-			Console.WriteLine($"===> merging {s._asm} {this._asm}");
+			Console.WriteLine($"===> merging {s._asm} & {this._asm}");
 
 			// inherit children from s
 			children.AddRange(
@@ -74,6 +74,8 @@ namespace bs {
 		// returns the scope on success, returns global on
 		// fail.
 		public static scope Find(string fullname) {
+			Console.WriteLine($"===> fetching {fullname} ...");
+
 			string[] path = fullname.Split('.'); // split at separators
 			scope current = global_scope; //  recursive scope search
 
