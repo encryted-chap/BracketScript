@@ -96,7 +96,9 @@ namespace bs {
 				token_type ty = token_type.IDENTIFIER; // default to identifier
 
 				
-
+				// how does this code work? no idea! When I optimize it, 
+				// it stops working! So if someone (a contributor) would
+				// like to optimize it, go on ahead
 				if(spl[i] == "\"") {
 					// string literal
 					spl[i] = strlit[0]; // get string literal 0
@@ -104,21 +106,18 @@ namespace bs {
 
 					ty = token_type.LITERAL; // assign literal type
 					continue; // keep going to next token
-				} 
-
-				for(int j = (int)token_type.IDENTIFIER; j <= (int)token_type.KEYWORD; j++) {
-					if(!match.ContainsKey((token_type)i)) 
-						continue; // no need to check if uncheckable
-
-					// test for match
-					if(Array.IndexOf(match[(token_type)i], spl[i]) > -1) {
-						// its a match
-						ty = (token_type)i;
-					}
+				} else if(Array.IndexOf(match[token_type.OPERATOR], spl[i]) > -1) {
+					ty = token_type.OPERATOR; // is an operator
+				} else if(Array.IndexOf(match[token_type.KEYWORD], spl[i]) > -1) {
+					ty = token_type.KEYWORD; // is a keyword
+				} else {
+					// is an identifier
+					// try to check for literals
+					try {
+						System.Convert.ToInt32(spl[i]);
+						ty = token_type.LITERAL;
+					} catch { }
 				}
-
-				if(object.ReferenceEquals(null, ty))
-					ty = token_type.IDENTIFIER; // the default
 
 				// add this token
 				ret.Add(new token_t() {
