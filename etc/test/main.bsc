@@ -1,0 +1,8 @@
+
+import std::types; // for typeid() and 
+import std::libc; // C standard library package
+
+// entrypoint,  
+fn main(int: argc, String: *argv) {
+    
+}
